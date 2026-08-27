@@ -10333,6 +10333,32 @@
                 unlockAddDepartureModal();
             }
         });
+        function normalizeDepartureForDuplicate(value) {
+            return String(value || '')
+                .replace(/\u00a0/g, ' ')
+                .trim()
+                .replace(/\s+/g, ' ')
+                .toUpperCase();
+        }
+
+        function departureAlreadyExists(table, departure) {
+            const wanted = normalizeDepartureForDuplicate(departure);
+            if (!table || !wanted) return false;
+            const tableKey = addTableKey(table);
+            if (!tableKey) return false;
+
+            return tablesForAddKey(tableKey).some(candidateTable =>
+                Array.from(candidateTable.tBodies || []).some(tbody =>
+                    Array.from(tbody.rows).some(row => {
+                        if (row.style.display === 'none' && row.id?.startsWith('sub-')) return false;
+                        const values = getRowValues(row);
+                        if (values.length < 4) return false;
+                        return normalizeDepartureForDuplicate(values[0]) === wanted;
+                    })
+                )
+            );
+        }
+
         addDepartureForm.addEventListener('submit', event => {
             event.preventDefault();
             const values = [
@@ -10347,6 +10373,17 @@
                 addDepartureDesignation.setCustomValidity('');
                 return;
             }
+
+            if (values[0] && departureAlreadyExists(tableReceivingNewDeparture, values[0])) {
+                const tableName = addTableDisplayName(tableReceivingNewDeparture);
+                const confirmed = window.confirm(`Ce départ existe déjà dans ${tableName}. Ajouter quand même ?`);
+                if (!confirmed) {
+                    addDepartureDepart.focus();
+                    addDepartureDepart.select();
+                    return;
+                }
+            }
+
             const newRow = addDepartureToCurrentTable(values);
             closeAddDepartureModal();
             if (newRow) {
