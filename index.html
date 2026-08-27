@@ -9434,6 +9434,9 @@
             row.dataset.addTableKey = record.tableId;
             const values = Array.isArray(record.values) ? record.values.slice(0, 4) : ['', '', '', ''];
             while (values.length < 4) values.push('');
+            const originalValues = Array.isArray(record.originalValues) ? record.originalValues.slice(0, 4) : values.slice(0, 4);
+            while (originalValues.length < 4) originalValues.push('');
+            row.dataset.editOriginalValues = JSON.stringify(originalValues);
             values.forEach(value => {
                 const td = document.createElement('td');
                 td.textContent = value == null ? '' : String(value);
@@ -9586,6 +9589,13 @@
                 if (row.id?.startsWith('sub-') || row.classList.contains('section-label-row')) return;
                 const data = searchRowData(row);
                 if (!data) return;
+                // Certains tableaux historiques contiennent leur ligne d'en-tête dans <tbody>.
+                // Elle ne doit jamais être indexée comme une installation incomplète.
+                const headerLike = normalizeSearchText(data.depart) === 'depart'
+                    && normalizeSearchText(data.tension) === 'tension'
+                    && normalizeSearchText(data.designation) === 'designation'
+                    && normalizeSearchText(data.gisement) === 'gisement';
+                if (headerLike) return;
                 const context = searchRowContext(row);
                 const dedupeKey = [context.domain, context.table, data.depart, data.tension, data.designation, data.gisement]
                     .map(normalizeSearchText).join('|');
@@ -9708,7 +9718,18 @@
                     rebuildSearchIndex();
                     return;
                 }
-                openEditModal(match.row, { skipPassword: true });
+                // Transmet directement les valeurs affichées dans l'infobulle.
+                // Cela garantit le préremplissage même si la ligne DOM a été reconstruite
+                // après une synchronisation Firebase ou une réindexation.
+                openEditModal(match.row, {
+                    skipPassword: true,
+                    initialValues: [
+                        match.data.depart,
+                        match.data.tension,
+                        match.data.designation,
+                        match.data.gisement
+                    ]
+                });
             });
             item.appendChild(button);
 
@@ -10073,6 +10094,10 @@
         let cloudUnsubscribe = null;
         let cloudRefreshTimer = 0;
         let rowBeingEdited = null;
+        // Instantané des 4 valeurs réellement affichées au moment où l'utilisateur
+        // ouvre la modale. Cela garantit le préremplissage, y compris depuis
+        // l'infobulle « Lignes incomplètes » et après des corrections Firebase.
+        let editInitialValues = null;
         let tableReceivingNewDeparture = null;
         const addDepartureModalBackdrop = document.getElementById('addDepartureModalBackdrop');
         const addDepartureModalClose = document.getElementById('addDepartureModalClose');
@@ -10209,7 +10234,17 @@
 
             if (data && data.added === true && data.deleted !== true && data.tableId && Array.isArray(data.values)) {
                 const additions = loadAddedRowsStorage();
-                additions[rowId] = { id: rowId, tableId: data.tableId, values: data.values };
+                const previousAddition = additions[rowId] || {};
+                additions[rowId] = {
+                    id: rowId,
+                    tableId: data.tableId,
+                    values: data.values,
+                    originalValues: Array.isArray(data.originalValues)
+                        ? data.originalValues.slice(0, 4)
+                        : (Array.isArray(previousAddition.originalValues)
+                            ? previousAddition.originalValues.slice(0, 4)
+                            : (Array.isArray(previousAddition.values) ? previousAddition.values.slice(0, 4) : data.values.slice(0, 4)))
+                };
                 saveAddedRowsStorage(additions);
                 if (deletions[rowId]) {
                     delete deletions[rowId];
@@ -10303,7 +10338,13 @@
                     await ref.set({
                         values: deletions[rowId] ? null : (Array.isArray(edits[rowId]) ? edits[rowId] : (addedRecord?.values || null)),
                         deleted: !!deletions[rowId],
-                        ...(addedRecord ? { added: true, tableId: addedRecord.tableId } : {}),
+                        ...(addedRecord ? {
+                            added: true,
+                            tableId: addedRecord.tableId,
+                            originalValues: Array.isArray(addedRecord.originalValues)
+                                ? addedRecord.originalValues.slice(0, 4)
+                                : (Array.isArray(addedRecord.values) ? addedRecord.values.slice(0, 4) : ['', '', '', ''])
+                        } : {}),
                         ...(validated[rowId] ? { incompleteAccepted: true } : {}),
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
@@ -10472,6 +10513,29 @@
                 .map(td => ensureEditableCellContent(td).textContent.trim());
         }
 
+        function captureOriginalRowValues(row) {
+            if (!row || row.dataset.editOriginalValues) return;
+            const values = getRowValues(row).slice(0, 4);
+            while (values.length < 4) values.push('');
+            row.dataset.editOriginalValues = JSON.stringify(values);
+        }
+
+        function getOriginalRowValues(row) {
+            if (!row) return ['', '', '', ''];
+            captureOriginalRowValues(row);
+            try {
+                const values = JSON.parse(row.dataset.editOriginalValues || '[]');
+                if (Array.isArray(values)) {
+                    const result = values.slice(0, 4).map(value => value == null ? '' : String(value));
+                    while (result.length < 4) result.push('');
+                    return result;
+                }
+            } catch (_) {}
+            const fallback = getRowValues(row).slice(0, 4);
+            while (fallback.length < 4) fallback.push('');
+            return fallback;
+        }
+
         function setRowValues(row, values) {
             const cells = Array.from(row.children).filter(cell => cell.tagName === 'TD' && !cell.classList.contains('hierarchy-action-cell'));
             cells.forEach((td, index) => {
@@ -10511,6 +10575,10 @@
                 if (!cells.length) return;
 
                 cells.forEach(td => ensureEditableCellContent(td));
+                // Mémorise les valeurs inscrites dans le carnet AVANT d'appliquer
+                // une correction locale ou Firebase. Elles servent de référence
+                // lors des ouvertures ultérieures de la modale de modification.
+                captureOriginalRowValues(row);
 
                 if (Array.isArray(stored[row.dataset.editRowId])) {
                     setRowValues(row, stored[row.dataset.editRowId]);
@@ -10615,7 +10683,8 @@
             const record = {
                 id: addDepartureId(),
                 tableId,
-                values: values.slice(0, 4)
+                values: values.slice(0, 4),
+                originalValues: values.slice(0, 4)
             };
             const additions = loadAddedRowsStorage();
             additions[record.id] = record;
@@ -10634,7 +10703,11 @@
             initRowEditing();
             rebuildSearchIndex();
             if (searchInput.value.trim() !== '') renderSearchResults(searchInput.value);
-            saveCloudModification(record.id, record.values, false, { added: true, tableId: record.tableId });
+            saveCloudModification(record.id, record.values, false, {
+                added: true,
+                tableId: record.tableId,
+                originalValues: record.originalValues
+            });
             return rows[0] || null;
         }
 
@@ -10642,8 +10715,13 @@
             if (!rowBeingEdited) return;
 
             editFields.innerHTML = '';
-            const rawValues = getRowValues(rowBeingEdited).slice(0, 4);
-            const values = [0, 1, 2, 3].map(index => rawValues[index] || '');
+            // Préremplissage avec les valeurs présentes sur la ligne au moment du clic.
+            // L'instantané est pris dans openEditModal AVANT l'ouverture de la modale,
+            // ce qui fonctionne de la même façon depuis le crayon ou l'infobulle.
+            const rawValues = Array.isArray(editInitialValues)
+                ? editInitialValues.slice(0, 4)
+                : getRowValues(rowBeingEdited).slice(0, 4);
+            const values = [0, 1, 2, 3].map(index => rawValues[index] == null ? '' : String(rawValues[index]));
             const labels = ['Départ', 'Tension', 'Désignation', 'Gisement'];
 
             values.forEach((value, index) => {
@@ -10659,7 +10737,7 @@
                 input.type = 'text';
                 input.id = inputId;
                 input.dataset.editFieldIndex = String(index);
-                // Toujours préremplir avec la valeur réellement affichée dans la ligne.
+                // Toujours préremplir avec la valeur affichée avant cette modification.
                 input.value = value;
                 input.autocomplete = 'off';
 
@@ -10702,6 +10780,15 @@
 
         function openEditModal(row, options = {}) {
             rowBeingEdited = row;
+            // Depuis l'infobulle, les valeurs sont transmises explicitement : elles
+            // correspondent exactement à ce que l'utilisateur voit, y compris les
+            // valeurs incomplètes ou erronées. Sinon on lit directement la ligne.
+            const suppliedValues = Array.isArray(options.initialValues)
+                ? options.initialValues.slice(0, 4)
+                : null;
+            editInitialValues = suppliedValues || (row ? getRowValues(row).slice(0, 4) : ['', '', '', '']);
+            editInitialValues = editInitialValues.map(value => value == null ? '' : String(value));
+            while (editInitialValues.length < 4) editInitialValues.push('');
             editPassword.value = '';
             editPasswordError.textContent = '';
             editFields.innerHTML = '';
@@ -10730,6 +10817,7 @@
             editFields.innerHTML = '';
             editDeleteConfirm.classList.remove('open');
             rowBeingEdited = null;
+            editInitialValues = null;
         }
 
         function unlockEditModal() {
