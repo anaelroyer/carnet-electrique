@@ -4,7 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Carnet Électrique</title>
-    <!-- Version 86 : synchronisation Firebase des corrections -->
+    <meta name="theme-color" content="#121212">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Carnet Électrique">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+    <!-- Version 87 : PWA installable + synchronisation Firebase -->
     <style>
         :root {
             --bg-color: #121212;
@@ -54,6 +63,47 @@
         .sync-status[data-state="syncing"] { color: #fde68a; }
         .sync-status[data-state="offline"],
         .sync-status[data-state="error"] { color: #fca5a5; }
+
+
+        .pwa-install-panel {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 6px 0 2px;
+        }
+        .pwa-install-panel.open { display: flex; }
+        .pwa-install-btn {
+            min-height: 42px;
+            border: 1px solid #475569;
+            border-radius: 10px;
+            padding: 8px 14px;
+            background: #1e293b;
+            color: #f8fafc;
+            font: inherit;
+            font-size: .78rem;
+            font-weight: 800;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .pwa-install-btn:active { transform: translateY(1px); }
+        .pwa-install-help {
+            display: none;
+            margin: 6px auto 0;
+            max-width: 520px;
+            padding: 8px 10px;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            background: #0f172a;
+            color: #cbd5e1;
+            font-size: .72rem;
+            line-height: 1.35;
+            text-align: center;
+        }
+        .pwa-install-help.open { display: block; }
+        @media (display-mode: standalone) {
+            .pwa-install-panel, .pwa-install-help { display: none !important; }
+        }
 
         .gisement-search-results {
             display: none;
@@ -1400,6 +1450,10 @@
             <button type="button" id="clearSearchBtn" class="clear-search-btn" aria-label="Effacer la recherche" title="Effacer la recherche">×</button>
         </div>
         <div id="syncStatus" class="sync-status" data-state="syncing" aria-live="polite">☁ Connexion à la synchronisation…</div>
+        <div id="pwaInstallPanel" class="pwa-install-panel">
+            <button type="button" id="pwaInstallBtn" class="pwa-install-btn">⬇ Installer l’application</button>
+        </div>
+        <div id="pwaInstallHelp" class="pwa-install-help" aria-live="polite"></div>
     </div>
 
 
@@ -7746,6 +7800,77 @@
         </div>
     </div>
 
+
+    <!-- PWA : installation sur smartphone et fonctionnement hors ligne -->
+    <script>
+        (function initCarnetPwa() {
+            const installPanel = document.getElementById('pwaInstallPanel');
+            const installButton = document.getElementById('pwaInstallBtn');
+            const installHelp = document.getElementById('pwaInstallHelp');
+            let deferredInstallPrompt = null;
+
+            const isStandalone = () =>
+                window.matchMedia('(display-mode: standalone)').matches ||
+                window.navigator.standalone === true;
+
+            const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+            function hideInstallUi() {
+                installPanel?.classList.remove('open');
+                installHelp?.classList.remove('open');
+            }
+
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./sw.js', { scope: './' })
+                        .then(registration => {
+                            // Vérifie silencieusement s'il existe une version plus récente.
+                            registration.update().catch(() => {});
+                        })
+                        .catch(error => console.warn('Service Worker indisponible :', error));
+                });
+            }
+
+            window.addEventListener('beforeinstallprompt', event => {
+                event.preventDefault();
+                deferredInstallPrompt = event;
+                if (!isStandalone()) installPanel?.classList.add('open');
+            });
+
+            installButton?.addEventListener('click', async () => {
+                if (isStandalone()) {
+                    hideInstallUi();
+                    return;
+                }
+
+                if (deferredInstallPrompt) {
+                    deferredInstallPrompt.prompt();
+                    const choice = await deferredInstallPrompt.userChoice.catch(() => null);
+                    deferredInstallPrompt = null;
+                    if (!choice || choice.outcome === 'accepted') hideInstallUi();
+                    return;
+                }
+
+                // Safari iOS ne fournit pas beforeinstallprompt.
+                if (isIos) {
+                    installHelp.textContent = 'Sur iPhone/iPad : ouvrez cette page dans Safari, touchez Partager puis « Sur l’écran d’accueil ».';
+                } else {
+                    installHelp.textContent = 'Installation disponible depuis le menu du navigateur : choisissez « Installer l’application » ou « Ajouter à l’écran d’accueil ». Rechargez la page si l’option n’apparaît pas encore.';
+                }
+                installHelp.classList.add('open');
+            });
+
+            window.addEventListener('appinstalled', () => {
+                deferredInstallPrompt = null;
+                hideInstallUi();
+            });
+
+            // Sur iOS, propose une aide directe tant que l'app n'est pas installée.
+            if (isIos && !isStandalone()) {
+                installPanel?.classList.add('open');
+            }
+        })();
+    </script>
 
     <!-- Firebase : synchronisation temporaire des corrections entre appareils -->
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
