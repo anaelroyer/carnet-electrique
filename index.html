@@ -986,6 +986,66 @@
             border-left-color: #22c55e;
             background: #14281c;
         }
+        /* Sélection interactive d'un chemin dans les hiérarchies à alimentations multiples. */
+        .hierarchy-level-card {
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: opacity .18s ease, transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .hierarchy-level-card:focus-visible {
+            outline: 2px solid #60a5fa;
+            outline-offset: 2px;
+        }
+        .hierarchy-tree.path-filter-active .hierarchy-level-card:not(.path-highlighted) {
+            opacity: .20;
+            transform: scale(.985);
+            filter: saturate(.45);
+        }
+        .hierarchy-tree.path-filter-active .hierarchy-feed-line:not(.path-highlighted) {
+            opacity: .16;
+        }
+        .hierarchy-tree.path-filter-active .hierarchy-level-connector:not(.path-highlighted) {
+            opacity: .18;
+        }
+        .hierarchy-level-card.path-highlighted {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 2px rgba(96,165,250,.22), 0 7px 20px rgba(0,0,0,.24);
+        }
+        .hierarchy-level-card.path-selected-start {
+            border-color: #22c55e;
+            border-left-color: #22c55e;
+            background: #123524;
+            box-shadow: 0 0 0 2px rgba(34,197,94,.28), 0 7px 20px rgba(0,0,0,.28);
+        }
+        .hierarchy-feed-line.path-highlighted {
+            color: #f8fafc;
+            font-weight: 700;
+        }
+        .hierarchy-feed-line.path-highlighted .hierarchy-feed-arrow,
+        .hierarchy-feed-line.path-highlighted .hierarchy-feed-destination {
+            color: #60a5fa;
+        }
+        .hierarchy-level-connector.path-highlighted {
+            color: #dbeafe;
+        }
+        .hierarchy-level-connector.path-highlighted::before {
+            color: #60a5fa;
+        }
+        .hierarchy-target-wrap.path-highlighted .hierarchy-node {
+            box-shadow: 0 0 0 2px rgba(96,165,250,.30), 0 8px 24px rgba(0,0,0,.24);
+        }
+        .hierarchy-path-hint {
+            margin: -2px 0 10px;
+            color: #93c5fd;
+            font-size: .72rem;
+            line-height: 1.4;
+            font-weight: 700;
+        }
+        .hierarchy-path-hint.active {
+            color: #bbf7d0;
+        }
         .hierarchy-level-card-name {
             color: #fff;
             font-size: .86rem;
@@ -1415,6 +1475,10 @@
             .hierarchy-intro {
                 margin: 0 0 8px;
                 font-size: .72rem;
+            }
+            .hierarchy-path-hint {
+                margin-bottom: 8px;
+                font-size: .68rem;
             }
             .hierarchy-tree {
                 padding: 8px;
@@ -8635,6 +8699,18 @@
             if (!node) return null;
             const card = document.createElement('div');
             card.className = 'hierarchy-level-card' + (distance === maxDistance ? ' root' : '');
+            card.dataset.hierarchyNodeId = item.nodeId;
+            card.dataset.hierarchyDistance = String(distance);
+            card.tabIndex = 0;
+            card.setAttribute('role', 'button');
+            card.setAttribute('aria-pressed', 'false');
+            card.setAttribute('aria-label', 'Mettre en surbrillance le chemin depuis ' + node.name);
+            card.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    card.click();
+                }
+            });
 
             const name = document.createElement('div');
             name.className = 'hierarchy-level-card-name';
@@ -8658,6 +8734,9 @@
                 item.edges.forEach(edge => {
                     const line = document.createElement('div');
                     line.className = 'hierarchy-feed-line';
+                    line.dataset.hierarchyParentId = item.nodeId;
+                    line.dataset.hierarchyChildId = edge.childId || '';
+                    line.dataset.hierarchyEdgeSignature = edge.signature || '';
                     const arrow = document.createElement('span');
                     arrow.className = 'hierarchy-feed-arrow';
                     arrow.textContent = '↳';
@@ -8683,6 +8762,90 @@
             return card;
         }
 
+        function hierarchyClearPathHighlight(tree) {
+            if (!tree) return;
+            tree.classList.remove('path-filter-active');
+            delete tree.dataset.selectedNodeId;
+            tree.querySelectorAll('.path-highlighted, .path-selected-start').forEach(el => {
+                el.classList.remove('path-highlighted', 'path-selected-start');
+            });
+            tree.querySelectorAll('.hierarchy-level-card[aria-pressed="true"]').forEach(card => {
+                card.setAttribute('aria-pressed', 'false');
+            });
+        }
+
+        function hierarchyApplyPathHighlight(tree, paths, targetId, selectedNodeId, hint) {
+            hierarchyClearPathHighlight(tree);
+            if (!selectedNodeId) {
+                if (hint) {
+                    hint.classList.remove('active');
+                    hint.textContent = 'Touchez un tableau pour mettre en surbrillance sa chaîne jusqu’à la cible.';
+                }
+                return;
+            }
+
+            const selectedPaths = paths.filter(path => {
+                const start = path.nodes.indexOf(selectedNodeId);
+                const targetIndex = path.nodes.lastIndexOf(targetId);
+                return start >= 0 && targetIndex > start;
+            });
+            if (!selectedPaths.length) return;
+
+            const highlightedNodes = new Set();
+            const highlightedEdges = new Set();
+            let selectedDistance = 0;
+
+            selectedPaths.forEach(path => {
+                const start = path.nodes.indexOf(selectedNodeId);
+                const targetIndex = path.nodes.lastIndexOf(targetId);
+                for (let i = start; i <= targetIndex; i++) highlightedNodes.add(path.nodes[i]);
+                for (let i = start; i < targetIndex; i++) {
+                    const edge = path.edges[i];
+                    highlightedEdges.add([
+                        path.nodes[i] || '',
+                        path.nodes[i + 1] || '',
+                        edge?.signature || ''
+                    ].join('||'));
+                }
+            });
+
+            tree.classList.add('path-filter-active');
+            tree.dataset.selectedNodeId = selectedNodeId;
+
+            tree.querySelectorAll('.hierarchy-level-card').forEach(card => {
+                const nodeId = card.dataset.hierarchyNodeId || '';
+                const active = highlightedNodes.has(nodeId);
+                card.classList.toggle('path-highlighted', active);
+                card.classList.toggle('path-selected-start', nodeId === selectedNodeId);
+                card.setAttribute('aria-pressed', nodeId === selectedNodeId ? 'true' : 'false');
+                if (nodeId === selectedNodeId) selectedDistance = Number(card.dataset.hierarchyDistance || 0);
+            });
+
+            tree.querySelectorAll('.hierarchy-feed-line').forEach(line => {
+                const key = [
+                    line.dataset.hierarchyParentId || '',
+                    line.dataset.hierarchyChildId || '',
+                    line.dataset.hierarchyEdgeSignature || ''
+                ].join('||');
+                line.classList.toggle('path-highlighted', highlightedEdges.has(key));
+            });
+
+            tree.querySelectorAll('.hierarchy-level-connector').forEach(connector => {
+                const distance = Number(connector.dataset.hierarchyDistance || 0);
+                connector.classList.toggle('path-highlighted', distance > 0 && distance <= selectedDistance);
+            });
+
+            const targetWrap = tree.querySelector('.hierarchy-target-wrap');
+            if (targetWrap) targetWrap.classList.add('path-highlighted');
+
+            if (hint) {
+                const selectedNode = hierarchyNodes.get(selectedNodeId);
+                const targetNode = hierarchyNodes.get(targetId);
+                hint.classList.add('active');
+                hint.textContent = 'Chemin sélectionné : ' + (selectedNode?.name || 'tableau') + ' → ' + (targetNode?.name || 'cible') + '. Touchez à nouveau le tableau pour afficher tous les chemins.';
+            }
+        }
+
         function openHierarchyModal(nodeId) {
             const target = hierarchyNodes.get(nodeId);
             if (!target) return;
@@ -8696,6 +8859,13 @@
                 ? 'Hiérarchie regroupée : les alimentations alternatives d’un même niveau sont affichées côte à côte.'
                 : 'Chaîne d’alimentation identifiée, de la source amont vers l’élément sélectionné.';
             hierarchyModalBody.appendChild(intro);
+
+            const pathHint = document.createElement('div');
+            pathHint.className = 'hierarchy-path-hint';
+            pathHint.textContent = paths.length > 1
+                ? 'Touchez un tableau pour mettre en surbrillance sa chaîne jusqu’à la cible.'
+                : 'Touchez un tableau pour mettre en surbrillance la chaîne jusqu’à la cible.';
+            hierarchyModalBody.appendChild(pathHint);
 
             if (!paths.length || (paths.length === 1 && paths[0].nodes.length === 1)) {
                 const empty = document.createElement('div');
@@ -8729,6 +8899,7 @@
 
                     const connector = document.createElement('div');
                     connector.className = 'hierarchy-level-connector';
+                    connector.dataset.hierarchyDistance = String(level.distance);
                     connector.textContent = index === compact.levels.length - 1
                         ? (target.kind === 'line' ? 'vers l’équipement' : 'vers le tableau')
                         : 'niveau suivant';
@@ -8739,6 +8910,15 @@
                 targetWrap.className = 'hierarchy-target-wrap';
                 targetWrap.appendChild(hierarchyRenderNode(target, true, 0, compact.levels.length + 1));
                 tree.appendChild(targetWrap);
+
+                tree.addEventListener('click', event => {
+                    const card = event.target.closest('.hierarchy-level-card');
+                    if (!card || !tree.contains(card)) return;
+                    const selectedNodeId = card.dataset.hierarchyNodeId || '';
+                    const alreadySelected = tree.dataset.selectedNodeId === selectedNodeId;
+                    hierarchyApplyPathHighlight(tree, paths, nodeId, alreadySelected ? '' : selectedNodeId, pathHint);
+                });
+
                 hierarchyModalBody.appendChild(tree);
             }
 
