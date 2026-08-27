@@ -1547,6 +1547,56 @@
             }
         }
     </style>
+
+    <style>
+        /* Ajout manuel d'un départ */
+        .add-departure-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin: 8px 0 2px;
+        }
+        .add-departure-btn {
+            border: 1px solid #4b5563;
+            background: #202936;
+            color: #f8fafc;
+            border-radius: 8px;
+            padding: 7px 10px;
+            font-size: .76rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .15s ease, border-color .15s ease, transform .08s ease;
+        }
+        .add-departure-btn:hover,
+        .add-departure-btn:focus-visible {
+            background: #2b3747;
+            border-color: #60a5fa;
+            outline: none;
+        }
+        .add-departure-btn:active { transform: scale(.98); }
+        .add-modal-table-name {
+            margin: 0 0 10px;
+            padding: 7px 9px;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            background: #171717;
+            color: #93c5fd;
+            font-size: .78rem;
+            font-weight: 700;
+        }
+        @media (max-width: 600px) {
+            .add-departure-bar {
+                margin: 6px 0 1px;
+            }
+            .add-departure-btn {
+                width: 100%;
+                min-height: 38px;
+                padding: 7px 9px;
+                font-size: .72rem;
+                touch-action: manipulation;
+            }
+        }
+    </style>
+
 </head>
 <body>
 
@@ -7909,6 +7959,56 @@
     </div>
 
 
+
+    <!-- Modale d'ajout d'un départ -->
+    <div id="addDepartureModalBackdrop" class="edit-modal-backdrop" aria-hidden="true">
+        <div class="edit-modal" role="dialog" aria-modal="true" aria-labelledby="addDepartureModalTitle">
+            <div class="edit-modal-header">
+                <div id="addDepartureModalTitle" class="edit-modal-title">Ajouter un départ</div>
+                <button type="button" id="addDepartureModalClose" class="edit-modal-close" aria-label="Fermer">×</button>
+            </div>
+            <div class="edit-modal-body">
+                <div id="addDeparturePasswordStep">
+                    <p class="edit-note">Saisissez le mot de passe pour ajouter un départ.</p>
+                    <div id="addDepartureTableName" class="add-modal-table-name"></div>
+                    <div class="edit-field">
+                        <label for="addDeparturePassword">Mot de passe</label>
+                        <input id="addDeparturePassword" type="password" autocomplete="off" inputmode="text">
+                    </div>
+                    <div id="addDeparturePasswordError" class="edit-error"></div>
+                    <div class="edit-modal-actions">
+                        <button type="button" class="edit-cancel-btn" data-add-cancel>Annuler</button>
+                        <button type="button" id="addDepartureUnlockBtn" class="edit-unlock-btn">Déverrouiller</button>
+                    </div>
+                </div>
+                <form id="addDepartureForm" style="display:none;">
+                    <div id="addDepartureTableNameUnlocked" class="add-modal-table-name"></div>
+                    <div class="edit-field">
+                        <label for="addDepartureDepart">Départ</label>
+                        <input id="addDepartureDepart" type="text" autocomplete="off">
+                    </div>
+                    <div class="edit-field">
+                        <label for="addDepartureTension">Tension</label>
+                        <input id="addDepartureTension" type="text" autocomplete="off">
+                    </div>
+                    <div class="edit-field">
+                        <label for="addDepartureDesignation">Désignation</label>
+                        <input id="addDepartureDesignation" type="text" autocomplete="off">
+                    </div>
+                    <div class="edit-field">
+                        <label for="addDepartureGisement">Gisement</label>
+                        <input id="addDepartureGisement" type="text" autocomplete="off">
+                    </div>
+                    <p class="edit-note">Le nouveau départ sera enregistré localement et synchronisé sur les autres appareils via Firebase.</p>
+                    <div class="edit-modal-actions">
+                        <button type="button" class="edit-cancel-btn" data-add-cancel>Annuler</button>
+                        <button type="submit" class="edit-save-btn">Ajouter le départ</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- PWA : installation sur smartphone et fonctionnement hors ligne -->
     <footer class="app-footer-credit">Application réalisée par le MT ROYER</footer>
 
@@ -8283,7 +8383,12 @@
         }
 
         function hierarchyCellText(cell) {
-            return (cell?.textContent || '').replace(/[▲▼]/g, '').replace(/\s+/g, ' ').trim();
+            if (!cell) return '';
+            const editableContent = cell.querySelector?.(':scope > .cell-edit-content');
+            if (editableContent) return (editableContent.textContent || '').replace(/[▲▼]/g, '').replace(/\s+/g, ' ').trim();
+            const clone = cell.cloneNode(true);
+            clone.querySelectorAll?.('.edit-row-btn, .hierarchy-btn, .hierarchy-inline-btn, span[id^="arrow-"]').forEach(el => el.remove());
+            return (clone.textContent || '').replace(/[▲▼]/g, '').replace(/\s+/g, ' ').trim();
         }
 
         function hierarchyDomainName(element) {
@@ -8501,7 +8606,9 @@
                 const parentId = hierarchyParentNodeForRow(row);
                 if (!parentId || !hierarchyNodes.has(parentId)) return;
 
-                const nodeId = 'line:' + (++hierarchyLineSequence);
+                const nodeId = row.dataset.addedRow === 'true' && row.dataset.editRowId
+                    ? ('line-added:' + row.dataset.editRowId)
+                    : ('line:' + (++hierarchyLineSequence));
                 const nodeName = info.designation || info.depart || 'Ligne';
                 const node = hierarchyGetOrCreateNode(nodeId, {
                     key: nodeId,
@@ -9051,6 +9158,146 @@
             if (event.key === 'Escape' && hierarchyModalBackdrop.classList.contains('open')) closeHierarchyModal();
         });
 
+
+        /* ============================================================
+           Ajout de départs — stockage local + identification du tableau
+           ============================================================ */
+        const ADDED_ROWS_STORAGE_KEY = 'carnetElectriqueAddedRowsV1';
+
+        function loadAddedRowsStorage() {
+            try { return JSON.parse(localStorage.getItem(ADDED_ROWS_STORAGE_KEY) || '{}'); }
+            catch (e) { return {}; }
+        }
+
+        function saveAddedRowsStorage(rows) {
+            try { localStorage.setItem(ADDED_ROWS_STORAGE_KEY, JSON.stringify(rows)); }
+            catch (e) { console.warn('Impossible d’enregistrer les départs ajoutés localement.', e); }
+        }
+
+        function addTableKey(table) {
+            if (!table) return '';
+            const subrow = table.closest('tr[id^="sub-"]');
+            if (subrow) {
+                const trigger = subrow.previousElementSibling;
+                const info = trigger ? hierarchyRowInfo(trigger) : {};
+                const key = hierarchyExtractKey(info.designation || '');
+                if (key) return 'sub:' + key;
+                return 'subrow:' + subrow.id;
+            }
+            const panelItem = table.closest('.panel-item');
+            const details = panelItem ? Array.from(panelItem.children).find(el => el.tagName === 'DETAILS') : null;
+            return details?.id ? ('main:' + details.id) : '';
+        }
+
+        function addTableDisplayName(table) {
+            if (!table) return 'Tableau';
+            const subrow = table.closest('tr[id^="sub-"]');
+            if (subrow) {
+                const trigger = subrow.previousElementSibling;
+                const info = trigger ? hierarchyRowInfo(trigger) : {};
+                if (info.designation) return info.designation;
+                const heading = table.closest('.sub-table-container')?.firstElementChild;
+                if (heading) return hierarchyCellText(heading);
+            }
+            const details = table.closest('.panel-item')?.querySelector(':scope > details');
+            const name = details?.querySelector(':scope > summary .panel-name')?.textContent?.trim();
+            return hierarchyCleanPanelName(name || '') || 'Tableau';
+        }
+
+        function tablesForAddKey(tableKey) {
+            return Array.from(document.querySelectorAll('.panel-item table')).filter(table => addTableKey(table) === tableKey);
+        }
+
+        function createAddedRowElement(record, actionColumnReady = false) {
+            const row = document.createElement('tr');
+            row.dataset.addedRow = 'true';
+            row.dataset.editRowId = record.id;
+            row.dataset.addTableKey = record.tableId;
+            const values = Array.isArray(record.values) ? record.values.slice(0, 4) : ['', '', '', ''];
+            while (values.length < 4) values.push('');
+            values.forEach(value => {
+                const td = document.createElement('td');
+                td.textContent = value == null ? '' : String(value);
+                row.appendChild(td);
+            });
+            if (actionColumnReady) {
+                const actionCell = document.createElement('td');
+                actionCell.className = 'hierarchy-action-cell';
+                actionCell.setAttribute('aria-label', 'Actions de la ligne');
+                row.appendChild(actionCell);
+            }
+            return row;
+        }
+
+        function restoreAddedRowsBeforeHierarchy() {
+            const additions = loadAddedRowsStorage();
+            let deletions = {};
+            try { deletions = JSON.parse(localStorage.getItem('carnetElectriqueDeletedRowsV2') || '{}'); }
+            catch (e) { deletions = {}; }
+
+            Object.values(additions).forEach(record => {
+                if (!record?.id || !record?.tableId || deletions[record.id]) return;
+                if (document.querySelector(`tr[data-edit-row-id="${CSS.escape(record.id)}"]`)) return;
+                tablesForAddKey(record.tableId).forEach(table => {
+                    const tbody = table.tBodies?.[0];
+                    if (!tbody) return;
+                    tbody.appendChild(createAddedRowElement(record, false));
+                });
+            });
+        }
+
+        function hierarchyRegisterAddedRows(rows) {
+            rows.forEach(row => {
+                if (!row || hierarchyRowToNode.has(row)) return;
+                const info = hierarchyRowInfo(row);
+                const parentId = hierarchyParentNodeForRow(row);
+                if (!parentId || !hierarchyNodes.has(parentId)) return;
+                const rowId = row.dataset.editRowId || ('runtime-' + (++hierarchyLineSequence));
+                const nodeId = 'line-added:' + rowId;
+                const node = hierarchyGetOrCreateNode(nodeId, {
+                    key: nodeId,
+                    name: info.designation || info.depart || 'Ligne',
+                    domain: hierarchyDomainName(row),
+                    gisement: info.gisement,
+                    kind: 'line',
+                    depart: info.depart,
+                    tension: info.tension
+                });
+                if (!node.triggerRows.includes(row)) node.triggerRows.push(row);
+                hierarchyRowToNode.set(row, nodeId);
+                hierarchyAddParent(nodeId, parentId, {
+                    depart: info.depart,
+                    tension: info.tension,
+                    designation: '',
+                    gisement: info.gisement
+                });
+            });
+            hierarchyInstallButtons();
+        }
+
+        function ensureAddedRowsRendered(record, runtime = true) {
+            if (!record?.id || !record?.tableId) return [];
+            const existing = typeof rowsWithStableId === 'function' ? rowsWithStableId(record.id) : [];
+            if (existing.length) return existing;
+            const created = [];
+            tablesForAddKey(record.tableId).forEach(table => {
+                const tbody = table.tBodies?.[0];
+                if (!tbody) return;
+                const row = createAddedRowElement(record, runtime);
+                tbody.appendChild(row);
+                created.push(row);
+            });
+            if (runtime && created.length) {
+                hierarchyRegisterAddedRows(created);
+                if (typeof initRowEditing === 'function') initRowEditing();
+                if (typeof rebuildSearchIndex === 'function') rebuildSearchIndex();
+                if (typeof initAddDepartureButtons === 'function') initAddDepartureButtons();
+            }
+            return created;
+        }
+
+        restoreAddedRowsBeforeHierarchy();
+
         initElectricalHierarchy();
 
 
@@ -9441,6 +9688,21 @@
         let cloudUnsubscribe = null;
         let cloudRefreshTimer = 0;
         let rowBeingEdited = null;
+        let tableReceivingNewDeparture = null;
+        const addDepartureModalBackdrop = document.getElementById('addDepartureModalBackdrop');
+        const addDepartureModalClose = document.getElementById('addDepartureModalClose');
+        const addDepartureModalTitle = document.getElementById('addDepartureModalTitle');
+        const addDeparturePasswordStep = document.getElementById('addDeparturePasswordStep');
+        const addDeparturePassword = document.getElementById('addDeparturePassword');
+        const addDeparturePasswordError = document.getElementById('addDeparturePasswordError');
+        const addDepartureUnlockBtn = document.getElementById('addDepartureUnlockBtn');
+        const addDepartureForm = document.getElementById('addDepartureForm');
+        const addDepartureTableName = document.getElementById('addDepartureTableName');
+        const addDepartureTableNameUnlocked = document.getElementById('addDepartureTableNameUnlocked');
+        const addDepartureDepart = document.getElementById('addDepartureDepart');
+        const addDepartureTension = document.getElementById('addDepartureTension');
+        const addDepartureDesignation = document.getElementById('addDepartureDesignation');
+        const addDepartureGisement = document.getElementById('addDepartureGisement');
 
         function setSyncStatus(state, label) {
             if (!syncStatus) return;
@@ -9504,6 +9766,17 @@
             const deletions = loadStoredDeletions();
             const wasDeletedLocally = !!deletions[rowId];
 
+            if (data && data.added === true && data.deleted !== true && data.tableId && Array.isArray(data.values)) {
+                const additions = loadAddedRowsStorage();
+                additions[rowId] = { id: rowId, tableId: data.tableId, values: data.values };
+                saveAddedRowsStorage(additions);
+                if (deletions[rowId]) {
+                    delete deletions[rowId];
+                    saveStoredDeletions(deletions);
+                }
+                ensureAddedRowsRendered(additions[rowId], true);
+            }
+
             if (data && data.deleted === true) {
                 deletions[rowId] = true;
                 saveStoredDeletions(deletions);
@@ -9538,7 +9811,7 @@
             }
         }
 
-        async function saveCloudModification(rowId, values, deleted) {
+        async function saveCloudModification(rowId, values, deleted, extra = {}) {
             if (!cloudDbAvailable()) {
                 setSyncStatus(navigator.onLine ? 'error' : 'offline', navigator.onLine ? '⚠ Synchronisation indisponible' : '☁ Hors ligne · sauvegarde locale');
                 return;
@@ -9549,6 +9822,7 @@
                 await window.carnetCloudDb.collection(CLOUD_COLLECTION).doc(rowId).set({
                     values: deleted ? null : values,
                     deleted: !!deleted,
+                    ...extra,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
                 setSyncStatus('online', '☁ Synchronisé');
@@ -9562,16 +9836,19 @@
             if (!cloudDbAvailable()) return;
             const edits = loadStoredEdits();
             const deletions = loadStoredDeletions();
-            const rowIds = Array.from(new Set([...Object.keys(edits), ...Object.keys(deletions)]));
+            const additions = loadAddedRowsStorage();
+            const rowIds = Array.from(new Set([...Object.keys(edits), ...Object.keys(deletions), ...Object.keys(additions)]));
 
             for (const rowId of rowIds) {
                 try {
                     const ref = window.carnetCloudDb.collection(CLOUD_COLLECTION).doc(rowId);
                     const snapshot = await ref.get();
                     if (snapshot.exists) continue;
+                    const addedRecord = additions[rowId] || null;
                     await ref.set({
-                        values: deletions[rowId] ? null : (Array.isArray(edits[rowId]) ? edits[rowId] : null),
+                        values: deletions[rowId] ? null : (Array.isArray(edits[rowId]) ? edits[rowId] : (addedRecord?.values || null)),
                         deleted: !!deletions[rowId],
+                        ...(addedRecord ? { added: true, tableId: addedRecord.tableId } : {}),
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 } catch (error) {
@@ -9645,6 +9922,10 @@
 
         function assignStableRowIds(rows) {
             rows.forEach((row, index) => {
+                if (row.dataset.addedRow === 'true' && row.dataset.editRowId) {
+                    row.dataset.legacyEditRowId = row.dataset.legacyEditRowId || '';
+                    return;
+                }
                 const base = stableRowBase(row);
                 // Deux représentations du même tableau/départ/équipement partagent volontairement
                 // le même identifiant : une correction reste cohérente partout où la ligne est affichée.
@@ -9801,6 +10082,102 @@
             });
         }
 
+
+        function addDepartureId() {
+            const randomPart = (window.crypto?.getRandomValues)
+                ? Array.from(window.crypto.getRandomValues(new Uint32Array(2))).map(v => v.toString(36)).join('')
+                : Math.random().toString(36).slice(2) + Date.now().toString(36);
+            return 'added-' + randomPart;
+        }
+
+        function openAddDepartureModal(table) {
+            tableReceivingNewDeparture = table;
+            const tableName = addTableDisplayName(table);
+            addDepartureModalTitle.textContent = 'Ajouter un départ';
+            addDepartureTableName.textContent = 'Tableau : ' + tableName;
+            addDepartureTableNameUnlocked.textContent = 'Tableau : ' + tableName;
+            addDeparturePassword.value = '';
+            addDeparturePasswordError.textContent = '';
+            addDeparturePasswordStep.style.display = '';
+            addDepartureForm.style.display = 'none';
+            addDepartureForm.reset();
+            addDepartureModalBackdrop.classList.add('open');
+            addDepartureModalBackdrop.setAttribute('aria-hidden', 'false');
+            setTimeout(() => addDeparturePassword.focus(), 0);
+        }
+
+        function closeAddDepartureModal() {
+            addDepartureModalBackdrop.classList.remove('open');
+            addDepartureModalBackdrop.setAttribute('aria-hidden', 'true');
+            addDeparturePassword.value = '';
+            addDeparturePasswordError.textContent = '';
+            addDepartureForm.reset();
+            tableReceivingNewDeparture = null;
+        }
+
+        function unlockAddDepartureModal() {
+            if (addDeparturePassword.value !== EDIT_PASSWORD) {
+                addDeparturePasswordError.textContent = 'Mot de passe incorrect.';
+                addDeparturePassword.select();
+                return;
+            }
+            addDeparturePasswordError.textContent = '';
+            addDeparturePasswordStep.style.display = 'none';
+            addDepartureForm.style.display = '';
+            setTimeout(() => addDepartureDepart.focus(), 0);
+        }
+
+        function initAddDepartureButtons() {
+            document.querySelectorAll('.panel-item table').forEach(table => {
+                if (!table.tBodies?.length || !addTableKey(table)) return;
+                if (table.nextElementSibling?.classList?.contains('add-departure-bar')) return;
+                const bar = document.createElement('div');
+                bar.className = 'add-departure-bar';
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'add-departure-btn';
+                button.textContent = '+ Ajouter un départ';
+                button.setAttribute('aria-label', 'Ajouter un départ dans ' + addTableDisplayName(table));
+                button.addEventListener('click', event => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    openAddDepartureModal(table);
+                });
+                bar.appendChild(button);
+                table.insertAdjacentElement('afterend', bar);
+            });
+        }
+
+        function addDepartureToCurrentTable(values) {
+            if (!tableReceivingNewDeparture) return null;
+            const tableId = addTableKey(tableReceivingNewDeparture);
+            if (!tableId) return null;
+            const record = {
+                id: addDepartureId(),
+                tableId,
+                values: values.slice(0, 4)
+            };
+            const additions = loadAddedRowsStorage();
+            additions[record.id] = record;
+            saveAddedRowsStorage(additions);
+
+            const rows = [];
+            tablesForAddKey(tableId).forEach(table => {
+                const tbody = table.tBodies?.[0];
+                if (!tbody) return;
+                const row = createAddedRowElement(record, true);
+                tbody.appendChild(row);
+                rows.push(row);
+            });
+
+            hierarchyRegisterAddedRows(rows);
+            initRowEditing();
+            rebuildSearchIndex();
+            if (searchInput.value.trim() !== '') renderSearchResults(searchInput.value);
+            saveCloudModification(record.id, record.values, false, { added: true, tableId: record.tableId });
+            return rows[0] || null;
+        }
+
         function openEditModal(row) {
             rowBeingEdited = row;
             editPassword.value = '';
@@ -9948,7 +10325,49 @@
             if (event.key === 'Escape' && editModalBackdrop.classList.contains('open')) closeEditModal();
         });
 
+
+        addDepartureUnlockBtn.addEventListener('click', unlockAddDepartureModal);
+        addDeparturePassword.addEventListener('keydown', event => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                unlockAddDepartureModal();
+            }
+        });
+        addDepartureForm.addEventListener('submit', event => {
+            event.preventDefault();
+            const values = [
+                addDepartureDepart.value.trim(),
+                addDepartureTension.value.trim(),
+                addDepartureDesignation.value.trim(),
+                addDepartureGisement.value.trim()
+            ];
+            if (!values[0] && !values[2]) {
+                addDepartureDesignation.setCustomValidity('Renseignez au minimum un départ ou une désignation.');
+                addDepartureDesignation.reportValidity();
+                addDepartureDesignation.setCustomValidity('');
+                return;
+            }
+            const newRow = addDepartureToCurrentTable(values);
+            closeAddDepartureModal();
+            if (newRow) {
+                requestAnimationFrame(() => {
+                    newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    newRow.classList.add('search-target-flash');
+                    setTimeout(() => newRow.classList.remove('search-target-flash'), 1600);
+                });
+            }
+        });
+        addDepartureModalClose.addEventListener('click', closeAddDepartureModal);
+        document.querySelectorAll('[data-add-cancel]').forEach(button => button.addEventListener('click', closeAddDepartureModal));
+        addDepartureModalBackdrop.addEventListener('click', event => {
+            if (event.target === addDepartureModalBackdrop) closeAddDepartureModal();
+        });
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && addDepartureModalBackdrop.classList.contains('open')) closeAddDepartureModal();
+        });
+
         initRowEditing();
+        initAddDepartureButtons();
         initCloudSync();
         // ---------------------------------------------------------------------
 
