@@ -9649,7 +9649,7 @@
 
             const gisement = String(data?.gisement || '').trim();
             if (gisement && !gisement.includes('?') && !isCompleteGisement(gisement)) {
-                issues.push('Gisement invalide (A1234 attendu pour chaque gisement)');
+                issues.push('Gisement invalide');
             }
             return issues;
         }
