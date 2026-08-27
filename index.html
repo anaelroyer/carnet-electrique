@@ -1553,7 +1553,7 @@
         .add-departure-bar {
             display: flex;
             justify-content: flex-end;
-            margin: 8px 0 2px;
+            margin: 2px 0 8px;
         }
         .add-departure-btn {
             border: 1px solid #4b5563;
@@ -1585,7 +1585,7 @@
         }
         @media (max-width: 600px) {
             .add-departure-bar {
-                margin: 6px 0 1px;
+                margin: 2px 0 6px;
             }
             .add-departure-btn {
                 width: 100%;
@@ -10130,7 +10130,11 @@
         function initAddDepartureButtons() {
             document.querySelectorAll('.panel-item table').forEach(table => {
                 if (!table.tBodies?.length || !addTableKey(table)) return;
-                if (table.nextElementSibling?.classList?.contains('add-departure-bar')) return;
+
+                // Le bouton est placé au-dessus du tableau, donc avant les en-têtes et la première ligne.
+                // Cela le rend immédiatement accessible à l'ouverture d'un tableau/sous-tableau.
+                if (table.previousElementSibling?.classList?.contains('add-departure-bar')) return;
+
                 const bar = document.createElement('div');
                 bar.className = 'add-departure-bar';
                 const button = document.createElement('button');
@@ -10144,7 +10148,7 @@
                     openAddDepartureModal(table);
                 });
                 bar.appendChild(button);
-                table.insertAdjacentElement('afterend', bar);
+                table.insertAdjacentElement('beforebegin', bar);
             });
         }
 
