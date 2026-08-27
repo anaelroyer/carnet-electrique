@@ -1529,6 +1529,23 @@
             .badge-gisement { font-size: .68rem; }
         }
 
+    
+        .app-footer-credit {
+            text-align: center;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 400;
+            opacity: 0.82;
+            padding: 18px 12px calc(18px + env(safe-area-inset-bottom));
+            letter-spacing: 0.15px;
+        }
+
+        @media (max-width: 600px) {
+            .app-footer-credit {
+                font-size: 10px;
+                padding-top: 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -7893,6 +7910,8 @@
 
 
     <!-- PWA : installation sur smartphone et fonctionnement hors ligne -->
+    <footer class="app-footer-credit">Application réalisée par le MT ROYER</footer>
+
     <script>
         (function initCarnetPwa() {
             const installPanel = document.getElementById('pwaInstallPanel');

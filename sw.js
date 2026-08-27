@@ -1,4 +1,4 @@
-const CACHE_NAME = 'carnet-electrique-v89';
+const CACHE_NAME = 'carnet-electrique-v90';
 const APP_SHELL = [
   './',
   './index.html',
