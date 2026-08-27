@@ -106,7 +106,7 @@
         }
 
 
-        /* Lignes incomplètes : champ vide, présence de ? ou gisement hors format A1234. */
+        /* Lignes incomplètes : champ vide, présence de ? ou gisement(s) hors format A1234. */
         .incomplete-lines-panel {
             margin: 0 0 12px;
             border: 1px solid #b45309;
@@ -181,24 +181,58 @@
             flex-direction: column;
         }
         .incomplete-line-item {
-            display: block;
+            display: flex;
+            align-items: stretch;
             width: 100%;
             min-height: 48px;
-            padding: 8px 10px;
-            border: 0;
             border-bottom: 1px solid rgba(148,163,184,.14);
             background: transparent;
             color: #fff;
+        }
+        .incomplete-line-item:last-child { border-bottom: 0; }
+        .incomplete-line-edit {
+            flex: 1 1 auto;
+            min-width: 0;
+            padding: 8px 10px;
+            border: 0;
+            background: transparent;
+            color: inherit;
             text-align: left;
             font: inherit;
             cursor: pointer;
             touch-action: manipulation;
         }
-        .incomplete-line-item:last-child { border-bottom: 0; }
-        .incomplete-line-item:hover,
-        .incomplete-line-item:focus {
+        .incomplete-line-edit:hover,
+        .incomplete-line-edit:focus-visible {
             background: rgba(245,158,11,.10);
             outline: none;
+        }
+        .incomplete-line-actions {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            padding: 6px 7px 6px 0;
+        }
+        .incomplete-line-validate {
+            min-height: 34px;
+            padding: 5px 8px;
+            border: 1px solid rgba(34,197,94,.52);
+            border-radius: 8px;
+            background: rgba(22,101,52,.28);
+            color: #bbf7d0;
+            font: inherit;
+            font-size: .63rem;
+            font-weight: 850;
+            line-height: 1.15;
+            white-space: nowrap;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .incomplete-line-validate:hover,
+        .incomplete-line-validate:focus-visible {
+            background: rgba(22,101,52,.46);
+            outline: 2px solid rgba(74,222,128,.6);
+            outline-offset: 1px;
         }
         .incomplete-line-main {
             color: #f8fafc;
@@ -265,9 +299,13 @@
             .incomplete-lines-title { font-size: .77rem; }
             .incomplete-lines-hint { font-size: .62rem; }
             .incomplete-lines-count { font-size: .65rem; }
-            .incomplete-line-item {
-                min-height: 46px;
-                padding: 7px 9px;
+            .incomplete-line-item { min-height: 46px; }
+            .incomplete-line-edit { padding: 7px 8px; }
+            .incomplete-line-actions { padding: 5px 6px 5px 0; }
+            .incomplete-line-validate {
+                min-height: 32px;
+                padding: 4px 6px;
+                font-size: .59rem;
             }
             .incomplete-line-main { font-size: .74rem; }
             .incomplete-line-context,
@@ -1789,7 +1827,7 @@
         <button type="button" id="incompleteLinesToggle" class="incomplete-lines-toggle" aria-expanded="false">
             <span class="incomplete-lines-title-wrap">
                 <span class="incomplete-lines-title">⚠ Lignes incomplètes</span>
-                <span id="incompleteLinesHint" class="incomplete-lines-hint">Champs obligatoires · aucun ? · gisement au format A1234</span>
+                <span id="incompleteLinesHint" class="incomplete-lines-hint">Champs obligatoires · aucun ? · gisement(s) au format A1234</span>
             </span>
             <span id="incompleteLinesCount" class="incomplete-lines-count">0</span>
         </button>
@@ -9572,7 +9610,13 @@
         }
 
         function isCompleteGisement(value) {
-            return /^[A-Za-z]\d{4}$/.test(String(value || '').trim());
+            const raw = String(value || '').trim();
+            if (!raw) return false;
+
+            // Un ou plusieurs gisements sont acceptés tant que chaque code respecte A1234.
+            // Séparateurs tolérés : espaces, /, virgule, point-virgule, +, &, tiret.
+            const tokens = raw.split(/[\s/,;+&-]+/).filter(Boolean);
+            return tokens.length > 0 && tokens.every(token => /^[A-Za-z]\d{4}$/.test(token));
         }
 
         function incompleteLineIssues(data) {
@@ -9595,7 +9639,7 @@
 
             const gisement = String(data?.gisement || '').trim();
             if (gisement && !gisement.includes('?') && !isCompleteGisement(gisement)) {
-                issues.push('Gisement invalide (A1234 attendu)');
+                issues.push('Gisement invalide (A1234 attendu pour chaque gisement)');
             }
             return issues;
         }
@@ -9604,10 +9648,19 @@
             return incompleteLineIssues(data).length > 0;
         }
 
+        function isIncompleteLineAccepted(match) {
+            const rowId = match?.row?.dataset?.editRowId || '';
+            if (!rowId || typeof loadValidatedIncomplete !== 'function') return false;
+            return !!loadValidatedIncomplete()[rowId];
+        }
+
         function createIncompleteLineButton(match) {
+            const item = document.createElement('div');
+            item.className = 'incomplete-line-item';
+
             const button = document.createElement('button');
             button.type = 'button';
-            button.className = 'incomplete-line-item';
+            button.className = 'incomplete-line-edit';
             button.setAttribute('aria-label', 'Modifier la ligne incomplète ' + (match.data.depart || match.data.designation || 'sans nom'));
 
             const main = document.createElement('div');
@@ -9655,14 +9708,31 @@
                     rebuildSearchIndex();
                     return;
                 }
-                openEditModal(match.row);
+                openEditModal(match.row, { skipPassword: true });
             });
-            return button;
+            item.appendChild(button);
+
+            const actions = document.createElement('div');
+            actions.className = 'incomplete-line-actions';
+            const validateBtn = document.createElement('button');
+            validateBtn.type = 'button';
+            validateBtn.className = 'incomplete-line-validate';
+            validateBtn.textContent = '✓ Valider telle quelle';
+            validateBtn.title = 'Considérer cette ligne comme validée sans la modifier';
+            validateBtn.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopPropagation();
+                validateIncompleteLineAsIs(match);
+            });
+            actions.appendChild(validateBtn);
+            item.appendChild(actions);
+
+            return item;
         }
 
         function refreshIncompleteLines() {
             if (!incompleteLinesPanel || !incompleteLinesList) return;
-            const incomplete = searchIndex.filter(match => isIncompleteLine(match.data));
+            const incomplete = searchIndex.filter(match => isIncompleteLine(match.data) && !isIncompleteLineAccepted(match));
             const count = incomplete.length;
             incompleteLinesCount.textContent = count + (count > 1 ? ' lignes' : ' ligne');
             incompleteLinesPanel.classList.toggle('complete', count === 0);
@@ -9673,7 +9743,7 @@
                 incompleteLinesExpanded = false;
                 incompleteLinesPanel.classList.remove('expanded');
                 incompleteLinesToggle.setAttribute('aria-expanded', 'false');
-                incompleteLinesHint.textContent = 'Toutes les lignes sont complètes.';
+                incompleteLinesHint.textContent = 'Toutes les lignes sont complètes ou validées.';
                 incompleteLinesList.innerHTML = '<div class="incomplete-lines-empty">✓ Aucune ligne incomplète</div>';
                 return;
             }
@@ -9683,7 +9753,7 @@
             } else if (count > 4) {
                 incompleteLinesHint.textContent = '4 lignes affichées sur ' + count + ' · toucher ici pour tout afficher';
             } else {
-                incompleteLinesHint.textContent = 'Champs obligatoires · aucun ? · gisement au format A1234';
+                incompleteLinesHint.textContent = 'Champs obligatoires · aucun ? · gisement(s) au format A1234';
             }
 
             incompleteLinesList.innerHTML = '';
@@ -9692,7 +9762,7 @@
         }
 
         incompleteLinesToggle.addEventListener('click', () => {
-            if (searchIndex.filter(match => isIncompleteLine(match.data)).length <= 4 && !incompleteLinesExpanded) return;
+            if (searchIndex.filter(match => isIncompleteLine(match.data) && !isIncompleteLineAccepted(match)).length <= 4 && !incompleteLinesExpanded) return;
             incompleteLinesExpanded = !incompleteLinesExpanded;
             refreshIncompleteLines();
         });
@@ -9985,6 +10055,7 @@
         const EDIT_STORAGE_KEY = 'carnetElectriqueEditsV2';
         const DELETE_STORAGE_KEY = 'carnetElectriqueDeletedRowsV2';
         const STORAGE_MIGRATION_KEY = 'carnetElectriqueStableRowIdsV2';
+        const VALIDATED_INCOMPLETE_STORAGE_KEY = 'carnetElectriqueValidatedIncompleteV1';
         const editModalBackdrop = document.getElementById('editModalBackdrop');
         const editModalClose = document.getElementById('editModalClose');
         const editPasswordStep = document.getElementById('editPasswordStep');
@@ -10060,6 +10131,54 @@
             }
         }
 
+        function loadValidatedIncomplete() {
+            try {
+                return JSON.parse(localStorage.getItem(VALIDATED_INCOMPLETE_STORAGE_KEY) || '{}');
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function saveValidatedIncomplete(validated) {
+            try {
+                localStorage.setItem(VALIDATED_INCOMPLETE_STORAGE_KEY, JSON.stringify(validated));
+            } catch (e) {
+                console.warn('Impossible d’enregistrer les validations locales.', e);
+            }
+        }
+
+        async function saveCloudIncompleteValidation(rowId, accepted) {
+            if (!rowId) return;
+            if (!cloudDbAvailable()) {
+                setSyncStatus(navigator.onLine ? 'error' : 'offline', navigator.onLine ? '⚠ Synchronisation indisponible' : '☁ Hors ligne · sauvegarde locale');
+                return;
+            }
+            setSyncStatus('syncing', '☁ Synchronisation…');
+            try {
+                await window.carnetCloudDb.collection(CLOUD_COLLECTION).doc(rowId).set({
+                    incompleteAccepted: !!accepted,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                setSyncStatus('online', '☁ Synchronisé');
+            } catch (error) {
+                console.warn('Validation conservée localement, envoi Firebase impossible.', error);
+                setSyncStatus(navigator.onLine ? 'error' : 'offline', navigator.onLine ? '⚠ Synchro à réessayer' : '☁ Hors ligne · sauvegarde locale');
+            }
+        }
+
+        function validateIncompleteLineAsIs(match) {
+            const rowId = match?.row?.dataset?.editRowId || '';
+            if (!rowId) return;
+            const label = match?.data?.depart || match?.data?.designation || 'cette ligne';
+            if (!window.confirm(`Valider ${label} telle quelle ?\n\nCette ligne ne sera plus signalée comme incomplète sur les appareils synchronisés.`)) return;
+
+            const validated = loadValidatedIncomplete();
+            validated[rowId] = true;
+            saveValidatedIncomplete(validated);
+            refreshIncompleteLines();
+            saveCloudIncompleteValidation(rowId, true);
+        }
+
         function rowsWithStableId(rowId) {
             return Array.from(document.querySelectorAll('tr[data-edit-row-id]'))
                 .filter(row => row.dataset.editRowId === rowId);
@@ -10080,6 +10199,14 @@
             const deletions = loadStoredDeletions();
             const wasDeletedLocally = !!deletions[rowId];
 
+            if (data && typeof data.incompleteAccepted === 'boolean') {
+                const validated = loadValidatedIncomplete();
+                if (data.incompleteAccepted) validated[rowId] = true;
+                else delete validated[rowId];
+                saveValidatedIncomplete(validated);
+                scheduleCloudUiRefresh();
+            }
+
             if (data && data.added === true && data.deleted !== true && data.tableId && Array.isArray(data.values)) {
                 const additions = loadAddedRowsStorage();
                 additions[rowId] = { id: rowId, tableId: data.tableId, values: data.values };
@@ -10097,6 +10224,11 @@
                 if (Object.prototype.hasOwnProperty.call(edits, rowId)) {
                     delete edits[rowId];
                     saveStoredEdits(edits);
+                }
+                const validated = loadValidatedIncomplete();
+                if (validated[rowId]) {
+                    delete validated[rowId];
+                    saveValidatedIncomplete(validated);
                 }
                 rowsWithStableId(rowId).forEach(row => removeRowAndCompanion(row));
                 scheduleCloudUiRefresh();
@@ -10151,18 +10283,28 @@
             const edits = loadStoredEdits();
             const deletions = loadStoredDeletions();
             const additions = loadAddedRowsStorage();
-            const rowIds = Array.from(new Set([...Object.keys(edits), ...Object.keys(deletions), ...Object.keys(additions)]));
+            const validated = loadValidatedIncomplete();
+            const rowIds = Array.from(new Set([...Object.keys(edits), ...Object.keys(deletions), ...Object.keys(additions), ...Object.keys(validated)]));
 
             for (const rowId of rowIds) {
                 try {
                     const ref = window.carnetCloudDb.collection(CLOUD_COLLECTION).doc(rowId);
                     const snapshot = await ref.get();
-                    if (snapshot.exists) continue;
+                    if (snapshot.exists) {
+                        if (validated[rowId] && snapshot.data()?.incompleteAccepted !== true) {
+                            await ref.set({
+                                incompleteAccepted: true,
+                                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            }, { merge: true });
+                        }
+                        continue;
+                    }
                     const addedRecord = additions[rowId] || null;
                     await ref.set({
                         values: deletions[rowId] ? null : (Array.isArray(edits[rowId]) ? edits[rowId] : (addedRecord?.values || null)),
                         deleted: !!deletions[rowId],
                         ...(addedRecord ? { added: true, tableId: addedRecord.tableId } : {}),
+                        ...(validated[rowId] ? { incompleteAccepted: true } : {}),
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 } catch (error) {
@@ -10496,17 +10638,86 @@
             return rows[0] || null;
         }
 
-        function openEditModal(row) {
+        function populateEditFields() {
+            if (!rowBeingEdited) return;
+
+            editFields.innerHTML = '';
+            const rawValues = getRowValues(rowBeingEdited).slice(0, 4);
+            const values = [0, 1, 2, 3].map(index => rawValues[index] || '');
+            const labels = ['Départ', 'Tension', 'Désignation', 'Gisement'];
+
+            values.forEach((value, index) => {
+                const field = document.createElement('div');
+                field.className = 'edit-field';
+
+                const label = document.createElement('label');
+                const inputId = `editField-${index}`;
+                label.htmlFor = inputId;
+                label.textContent = labels[index];
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = inputId;
+                input.dataset.editFieldIndex = String(index);
+                // Toujours préremplir avec la valeur réellement affichée dans la ligne.
+                input.value = value;
+                input.autocomplete = 'off';
+
+                // Ergonomie smartphone : un appui dans un champ sélectionne toute
+                // sa valeur afin que la nouvelle saisie la remplace immédiatement.
+                const selectWholeField = () => {
+                    requestAnimationFrame(() => {
+                        try { input.select(); } catch (_) {}
+                    });
+                };
+                input.addEventListener('focus', selectWholeField);
+                input.addEventListener('click', selectWholeField);
+
+                field.appendChild(label);
+                field.appendChild(input);
+                editFields.appendChild(field);
+            });
+
+            // Sur smartphone, le clavier peut laisser la modale décalée après le mot de passe.
+            // On revient systématiquement en haut pour afficher les quatre champs.
+            const modal = editModalBackdrop.querySelector('.edit-modal');
+            if (modal) modal.scrollTop = 0;
+            requestAnimationFrame(() => {
+                if (modal) modal.scrollTop = 0;
+                const firstInput = editFields.querySelector('input');
+                if (firstInput) {
+                    firstInput.focus({ preventScroll: true });
+                    try { firstInput.select(); } catch (_) {}
+                }
+            });
+        }
+
+        function showEditFormDirectly() {
+            editPasswordError.textContent = '';
+            editPasswordStep.style.display = 'none';
+            editRowForm.style.display = '';
+            editDeleteConfirm.classList.remove('open');
+            populateEditFields();
+        }
+
+        function openEditModal(row, options = {}) {
             rowBeingEdited = row;
             editPassword.value = '';
             editPasswordError.textContent = '';
-            editPasswordStep.style.display = '';
-            editRowForm.style.display = 'none';
             editFields.innerHTML = '';
             editDeleteConfirm.classList.remove('open');
             editModalBackdrop.classList.add('open');
             editModalBackdrop.setAttribute('aria-hidden', 'false');
-            setTimeout(() => editPassword.focus(), 0);
+
+            if (options.skipPassword) {
+                showEditFormDirectly();
+            } else {
+                editPasswordStep.style.display = '';
+                editRowForm.style.display = 'none';
+                const modal = editModalBackdrop.querySelector('.edit-modal');
+                if (modal) modal.scrollTop = 0;
+                setTimeout(() => editPassword.focus({ preventScroll: true }), 0);
+            }
         }
 
         function closeEditModal() {
@@ -10514,6 +10725,8 @@
             editModalBackdrop.setAttribute('aria-hidden', 'true');
             editPassword.value = '';
             editPasswordError.textContent = '';
+            editPasswordStep.style.display = '';
+            editRowForm.style.display = 'none';
             editFields.innerHTML = '';
             editDeleteConfirm.classList.remove('open');
             rowBeingEdited = null;
@@ -10527,36 +10740,7 @@
             }
 
             if (!rowBeingEdited) return;
-            editPasswordError.textContent = '';
-            editPasswordStep.style.display = 'none';
-            editRowForm.style.display = '';
-            editFields.innerHTML = '';
-
-            const values = getRowValues(rowBeingEdited);
-            const labels = getColumnLabels(rowBeingEdited);
-
-            values.forEach((value, index) => {
-                const field = document.createElement('div');
-                field.className = 'edit-field';
-
-                const label = document.createElement('label');
-                const inputId = `editField-${index}`;
-                label.htmlFor = inputId;
-                label.textContent = labels[index] || `Champ ${index + 1}`;
-
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.id = inputId;
-                input.dataset.editFieldIndex = String(index);
-                input.value = value;
-
-                field.appendChild(label);
-                field.appendChild(input);
-                editFields.appendChild(field);
-            });
-
-            const firstInput = editFields.querySelector('input');
-            if (firstInput) setTimeout(() => firstInput.focus(), 0);
+            showEditFormDirectly();
         }
 
         editUnlockBtn.addEventListener('click', unlockEditModal);
@@ -10622,8 +10806,13 @@
                 delete stored[rowId];
                 saveStoredEdits(stored);
             }
+            const validated = loadValidatedIncomplete();
+            if (validated[rowId]) {
+                delete validated[rowId];
+                saveValidatedIncomplete(validated);
+            }
 
-            saveCloudModification(rowId, null, true);
+            saveCloudModification(rowId, null, true, { incompleteAccepted: false });
 
             closeEditModal();
             rowsWithStableId(rowId).forEach(row => removeRowAndCompanion(row));
