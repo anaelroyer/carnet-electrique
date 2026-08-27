@@ -13,7 +13,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
     <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
-    <!-- Version 87 : PWA installable + synchronisation Firebase -->
+    <!-- Version 88 : cellules adaptatives avec retour à la ligne -->
     <style>
         :root {
             --bg-color: #121212;
@@ -430,6 +430,21 @@
             padding: 8px 10px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            vertical-align: top;
+            height: auto;
+        }
+
+        tbody tr {
+            height: auto;
+        }
+
+        /* Les cellules de données grandissent verticalement au lieu de se chevaucher. */
+        tbody td:not(.hierarchy-action-cell) {
+            min-width: 0;
+            max-width: 100%;
         }
 
         th {
@@ -590,7 +605,7 @@
             outline: none;
         }
         .edit-row-btn:active { transform: scale(0.96); }
-        td.edit-action-cell { white-space: nowrap; }
+        td.edit-action-cell { white-space: normal; }
 
         .edit-modal-backdrop {
             position: fixed;
@@ -1096,11 +1111,17 @@
 
         /* Le crayon reste à gauche de la ligne ; la colonne de droite est réservée à la hiérarchie. */
         td.edit-action-cell {
-            white-space: nowrap;
+            white-space: normal;
         }
         td.edit-action-cell .edit-row-btn {
-            margin: 0 7px 0 0;
-            vertical-align: middle;
+            float: left;
+            margin: 0 7px 3px 0;
+            vertical-align: top;
+        }
+        td.edit-action-cell::after {
+            content: "";
+            display: block;
+            clear: both;
         }
         td.hierarchy-action-cell .hierarchy-inline-btn {
             margin: 0 auto;
@@ -1261,11 +1282,15 @@
             }
             th, td {
                 padding: 6px 5px;
-                line-height: 1.28;
-                vertical-align: middle;
+                line-height: 1.32;
+                vertical-align: top;
+                white-space: normal;
                 overflow-wrap: anywhere;
-                word-break: normal;
+                word-break: break-word;
+                height: auto;
             }
+            tbody tr { height: auto !important; }
+            td.edit-action-cell { white-space: normal !important; }
             th:nth-child(1), td:nth-child(1) { width: 25%; }
             th:nth-child(2), td:nth-child(2) { width: 11%; text-align: center; }
             th:nth-child(3), td:nth-child(3) { width: 38%; }
@@ -1278,6 +1303,8 @@
                 padding-left: 2px !important;
                 padding-right: 2px !important;
                 text-align: center !important;
+                white-space: nowrap !important;
+                vertical-align: middle !important;
             }
             th.hierarchy-action-header { font-size: .8rem; }
             tbody tr:nth-child(even):not(.expandable-row) > td {
