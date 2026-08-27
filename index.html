@@ -105,6 +105,175 @@
             .pwa-install-panel, .pwa-install-help { display: none !important; }
         }
 
+
+        /* Lignes incomplètes : champ vide, présence de ? ou gisement hors format A1234. */
+        .incomplete-lines-panel {
+            margin: 0 0 12px;
+            border: 1px solid #b45309;
+            border-radius: 11px;
+            overflow: hidden;
+            background: #1c160d;
+            box-shadow: 0 5px 18px rgba(0,0,0,.18);
+        }
+        .incomplete-lines-panel.complete {
+            border-color: #166534;
+            background: #0f1b14;
+        }
+        .incomplete-lines-toggle {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 9px 11px;
+            border: 0;
+            border-bottom: 1px solid rgba(180,83,9,.45);
+            background: #292012;
+            color: #fff;
+            font: inherit;
+            text-align: left;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .incomplete-lines-panel.complete .incomplete-lines-toggle {
+            border-bottom-color: rgba(22,101,52,.45);
+            background: #14251a;
+        }
+        .incomplete-lines-toggle:focus-visible {
+            outline: 2px solid #f59e0b;
+            outline-offset: -2px;
+        }
+        .incomplete-lines-title-wrap {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .incomplete-lines-title {
+            color: #fde68a;
+            font-size: .82rem;
+            font-weight: 850;
+            line-height: 1.25;
+        }
+        .incomplete-lines-panel.complete .incomplete-lines-title { color: #86efac; }
+        .incomplete-lines-hint {
+            color: #cbd5e1;
+            font-size: .66rem;
+            font-weight: 650;
+            line-height: 1.25;
+        }
+        .incomplete-lines-count {
+            flex: 0 0 auto;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: #92400e;
+            color: #fff7ed;
+            font-size: .70rem;
+            font-weight: 850;
+            white-space: nowrap;
+        }
+        .incomplete-lines-panel.complete .incomplete-lines-count {
+            background: #166534;
+            color: #dcfce7;
+        }
+        .incomplete-lines-list {
+            display: flex;
+            flex-direction: column;
+        }
+        .incomplete-line-item {
+            display: block;
+            width: 100%;
+            min-height: 48px;
+            padding: 8px 10px;
+            border: 0;
+            border-bottom: 1px solid rgba(148,163,184,.14);
+            background: transparent;
+            color: #fff;
+            text-align: left;
+            font: inherit;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .incomplete-line-item:last-child { border-bottom: 0; }
+        .incomplete-line-item:hover,
+        .incomplete-line-item:focus {
+            background: rgba(245,158,11,.10);
+            outline: none;
+        }
+        .incomplete-line-main {
+            color: #f8fafc;
+            font-size: .77rem;
+            font-weight: 800;
+            line-height: 1.3;
+            overflow-wrap: anywhere;
+        }
+        .incomplete-line-context {
+            margin-top: 2px;
+            color: #94a3b8;
+            font-size: .65rem;
+            font-weight: 650;
+            line-height: 1.25;
+            overflow-wrap: anywhere;
+        }
+        .incomplete-line-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 7px;
+            margin-top: 4px;
+            color: #cbd5e1;
+            font-size: .66rem;
+            line-height: 1.25;
+        }
+        .incomplete-gisement-value {
+            color: #fca5a5;
+            font-weight: 850;
+        }
+        .incomplete-line-reasons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 5px;
+        }
+        .incomplete-line-reason {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 6px;
+            border: 1px solid rgba(248,113,113,.42);
+            border-radius: 999px;
+            background: rgba(127,29,29,.26);
+            color: #fecaca;
+            font-size: .62rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+        .incomplete-lines-empty {
+            padding: 9px 11px;
+            color: #86efac;
+            font-size: .75rem;
+            font-weight: 750;
+            text-align: center;
+        }
+        @media (max-width: 600px) {
+            .incomplete-lines-panel {
+                margin-bottom: 8px;
+                border-radius: 10px;
+            }
+            .incomplete-lines-toggle {
+                min-height: 43px;
+                padding: 7px 9px;
+            }
+            .incomplete-lines-title { font-size: .77rem; }
+            .incomplete-lines-hint { font-size: .62rem; }
+            .incomplete-lines-count { font-size: .65rem; }
+            .incomplete-line-item {
+                min-height: 46px;
+                padding: 7px 9px;
+            }
+            .incomplete-line-main { font-size: .74rem; }
+            .incomplete-line-context,
+            .incomplete-line-meta { font-size: .62rem; }
+        }
+
         .gisement-search-results {
             display: none;
             margin: 0 0 20px;
@@ -1614,6 +1783,18 @@
         <div id="pwaInstallHelp" class="pwa-install-help" aria-live="polite"></div>
     </div>
 
+
+
+    <section id="incompleteLinesPanel" class="incomplete-lines-panel" aria-live="polite">
+        <button type="button" id="incompleteLinesToggle" class="incomplete-lines-toggle" aria-expanded="false">
+            <span class="incomplete-lines-title-wrap">
+                <span class="incomplete-lines-title">⚠ Lignes incomplètes</span>
+                <span id="incompleteLinesHint" class="incomplete-lines-hint">Champs obligatoires · aucun ? · gisement au format A1234</span>
+            </span>
+            <span id="incompleteLinesCount" class="incomplete-lines-count">0</span>
+        </button>
+        <div id="incompleteLinesList" class="incomplete-lines-list"></div>
+    </section>
 
     <div id="gisementSearchResults" class="gisement-search-results" aria-live="polite">
         <div class="gisement-search-header">
@@ -9309,6 +9490,12 @@
         const gisementSearchList = document.getElementById('gisementSearchList');
         const printSearchResultsBtn = document.getElementById('printSearchResultsBtn');
         const exportSearchResultsBtn = document.getElementById('exportSearchResultsBtn');
+        const incompleteLinesPanel = document.getElementById('incompleteLinesPanel');
+        const incompleteLinesToggle = document.getElementById('incompleteLinesToggle');
+        const incompleteLinesCount = document.getElementById('incompleteLinesCount');
+        const incompleteLinesHint = document.getElementById('incompleteLinesHint');
+        const incompleteLinesList = document.getElementById('incompleteLinesList');
+        let incompleteLinesExpanded = false;
         let searchIndex = [];
         let currentSearchMatches = [];
         let searchPrintOpenStates = [];
@@ -9381,7 +9568,134 @@
                 });
             });
             searchIndex = items;
+            refreshIncompleteLines();
         }
+
+        function isCompleteGisement(value) {
+            return /^[A-Za-z]\d{4}$/.test(String(value || '').trim());
+        }
+
+        function incompleteLineIssues(data) {
+            const issues = [];
+            const fields = [
+                ['Départ', data?.depart],
+                ['Tension', data?.tension],
+                ['Désignation', data?.designation],
+                ['Gisement', data?.gisement]
+            ];
+
+            fields.forEach(([label, rawValue]) => {
+                const value = String(rawValue || '').trim();
+                if (!value) {
+                    issues.push(label + ' vide');
+                } else if (value.includes('?')) {
+                    issues.push(label + ' contient ?');
+                }
+            });
+
+            const gisement = String(data?.gisement || '').trim();
+            if (gisement && !gisement.includes('?') && !isCompleteGisement(gisement)) {
+                issues.push('Gisement invalide (A1234 attendu)');
+            }
+            return issues;
+        }
+
+        function isIncompleteLine(data) {
+            return incompleteLineIssues(data).length > 0;
+        }
+
+        function createIncompleteLineButton(match) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'incomplete-line-item';
+            button.setAttribute('aria-label', 'Modifier la ligne incomplète ' + (match.data.depart || match.data.designation || 'sans nom'));
+
+            const main = document.createElement('div');
+            main.className = 'incomplete-line-main';
+            main.textContent = match.data.designation || '(désignation vide)';
+            button.appendChild(main);
+
+            const context = document.createElement('div');
+            context.className = 'incomplete-line-context';
+            context.textContent = match.context.domain + ' · ' + match.context.table;
+            button.appendChild(context);
+
+            const meta = document.createElement('div');
+            meta.className = 'incomplete-line-meta';
+
+            const depart = document.createElement('span');
+            depart.textContent = 'Départ : ' + (match.data.depart || 'vide');
+            meta.appendChild(depart);
+
+            const tension = document.createElement('span');
+            tension.textContent = 'Tension : ' + (match.data.tension || 'vide');
+            meta.appendChild(tension);
+
+            const gisement = document.createElement('span');
+            gisement.className = 'incomplete-gisement-value';
+            gisement.textContent = 'Gisement : ' + (match.data.gisement || 'vide');
+            meta.appendChild(gisement);
+
+            button.appendChild(meta);
+
+            const reasons = document.createElement('div');
+            reasons.className = 'incomplete-line-reasons';
+            incompleteLineIssues(match.data).forEach(reason => {
+                const badge = document.createElement('span');
+                badge.className = 'incomplete-line-reason';
+                badge.textContent = reason;
+                reasons.appendChild(badge);
+            });
+            button.appendChild(reasons);
+
+            button.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopPropagation();
+                if (!match.row?.isConnected) {
+                    rebuildSearchIndex();
+                    return;
+                }
+                openEditModal(match.row);
+            });
+            return button;
+        }
+
+        function refreshIncompleteLines() {
+            if (!incompleteLinesPanel || !incompleteLinesList) return;
+            const incomplete = searchIndex.filter(match => isIncompleteLine(match.data));
+            const count = incomplete.length;
+            incompleteLinesCount.textContent = count + (count > 1 ? ' lignes' : ' ligne');
+            incompleteLinesPanel.classList.toggle('complete', count === 0);
+            incompleteLinesPanel.classList.toggle('expanded', incompleteLinesExpanded);
+            incompleteLinesToggle.setAttribute('aria-expanded', incompleteLinesExpanded ? 'true' : 'false');
+
+            if (count === 0) {
+                incompleteLinesExpanded = false;
+                incompleteLinesPanel.classList.remove('expanded');
+                incompleteLinesToggle.setAttribute('aria-expanded', 'false');
+                incompleteLinesHint.textContent = 'Toutes les lignes sont complètes.';
+                incompleteLinesList.innerHTML = '<div class="incomplete-lines-empty">✓ Aucune ligne incomplète</div>';
+                return;
+            }
+
+            if (incompleteLinesExpanded) {
+                incompleteLinesHint.textContent = 'Toutes les lignes sont affichées · toucher ici pour replier';
+            } else if (count > 4) {
+                incompleteLinesHint.textContent = '4 lignes affichées sur ' + count + ' · toucher ici pour tout afficher';
+            } else {
+                incompleteLinesHint.textContent = 'Champs obligatoires · aucun ? · gisement au format A1234';
+            }
+
+            incompleteLinesList.innerHTML = '';
+            const visible = incompleteLinesExpanded ? incomplete : incomplete.slice(0, 4);
+            visible.forEach(match => incompleteLinesList.appendChild(createIncompleteLineButton(match)));
+        }
+
+        incompleteLinesToggle.addEventListener('click', () => {
+            if (searchIndex.filter(match => isIncompleteLine(match.data)).length <= 4 && !incompleteLinesExpanded) return;
+            incompleteLinesExpanded = !incompleteLinesExpanded;
+            refreshIncompleteLines();
+        });
 
         function revealSearchRow(row) {
             if (!row) return;
