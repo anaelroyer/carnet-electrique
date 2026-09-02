@@ -176,6 +176,68 @@
             background: #166534;
             color: #dcfce7;
         }
+        .incomplete-lines-filter {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 9px;
+            border-bottom: 1px solid rgba(180,83,9,.32);
+            background: rgba(15,23,42,.42);
+        }
+        .incomplete-lines-panel.complete .incomplete-lines-filter { display: none; }
+        .incomplete-lines-search-wrap {
+            position: relative;
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        .incomplete-lines-search {
+            width: 100%;
+            min-height: 36px;
+            box-sizing: border-box;
+            padding: 7px 38px 7px 10px;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            background: #0f172a;
+            color: #f8fafc;
+            font: inherit;
+            font-size: .73rem;
+            font-weight: 650;
+            outline: none;
+        }
+        .incomplete-lines-search::placeholder { color: #94a3b8; }
+        .incomplete-lines-search:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 2px rgba(245,158,11,.16);
+        }
+        .incomplete-lines-search-clear {
+            position: absolute;
+            top: 50%;
+            right: 4px;
+            transform: translateY(-50%);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 29px;
+            height: 29px;
+            padding: 0;
+            border: 0;
+            border-radius: 7px;
+            background: #334155;
+            color: #e2e8f0;
+            font: inherit;
+            font-size: 1rem;
+            line-height: 1;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .incomplete-lines-search-clear.open { display: flex; }
+        .incomplete-lines-no-result {
+            padding: 10px 11px;
+            color: #cbd5e1;
+            font-size: .73rem;
+            font-weight: 700;
+            text-align: center;
+        }
         .incomplete-lines-list {
             display: flex;
             flex-direction: column;
@@ -299,6 +361,9 @@
             .incomplete-lines-title { font-size: .77rem; }
             .incomplete-lines-hint { font-size: .62rem; }
             .incomplete-lines-count { font-size: .65rem; }
+            .incomplete-lines-filter { padding: 7px 8px; }
+            .incomplete-lines-search { min-height: 34px; font-size: .69rem; }
+            .incomplete-lines-search-clear { width: 27px; height: 27px; }
             .incomplete-line-item { min-height: 46px; }
             .incomplete-line-edit { padding: 7px 8px; }
             .incomplete-line-actions { padding: 5px 6px 5px 0; }
@@ -1831,6 +1896,15 @@
             </span>
             <span id="incompleteLinesCount" class="incomplete-lines-count">0</span>
         </button>
+        <div class="incomplete-lines-filter">
+            <div class="incomplete-lines-search-wrap">
+                <input type="search" id="incompleteLinesSearch" class="incomplete-lines-search"
+                       placeholder="Rechercher un tableau, une ligne…" autocomplete="off"
+                       aria-label="Rechercher dans les lignes incomplètes">
+                <button type="button" id="clearIncompleteLinesSearch" class="incomplete-lines-search-clear"
+                        aria-label="Effacer la recherche" title="Effacer la recherche">×</button>
+            </div>
+        </div>
         <div id="incompleteLinesList" class="incomplete-lines-list"></div>
     </section>
 
@@ -1931,7 +2005,7 @@
                                                             <tr><td>QE3</td><td>230V</td><td>E3AO43A - Prises chambre commandant, secrétariat CDT</td><td>L0415 L0425</td></tr>
                                                             <tr><td>QB4</td><td>400V</td><td>B4O43A - Alim borniers postes, chambre commandant</td><td>L0416 L0426 L0436 L0446 L0456 L0415 L0435 L0445</td></tr>
                                                             <tr><td>QB6</td><td>400V</td><td>B6O43A - Alim borniers postes infirmerie</td><td>L0212 L0211 L0213</td></tr>
-                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>/</td></tr>
+                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>L0331</td></tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2445,7 +2519,7 @@
                                                             <tr><td>Q01</td><td>400</td><td>FVP30A - Armoire élec frigo vivre bord</td><td>Q0035</td></tr>
                                                             <tr><td>Q11</td><td>400</td><td>FVA502 - Armoire principale frigo vivre bord</td><td>Q0035</td></tr>
                                                             <tr><td>Q1SP</td><td>400</td><td>Spare</td><td>/</td></tr>
-                                                            <tr><td>S1</td><td>400</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>/</td></tr>
+                                                            <tr><td>S1</td><td>400</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>L0027</td></tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2490,7 +2564,7 @@
                                                             <tr><td>Q04</td><td>400V</td><td>PM040506 - Coffret Coupure Pont roulant soute mun N°4</td><td>K2010</td></tr>
                                                             <tr><td>Q05</td><td>400V</td><td>VACMRPU301 - Unité d'alimentation à distance principal ventilation</td><td>K2014</td></tr>
                                                             <tr><td>Q06</td><td>230V</td><td>ILTCABAT-HC - Coffret de détection hydrocarbure</td><td>K2024</td></tr>
-                                                            <tr><td>VC</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>/</td></tr>
+                                                            <tr><td>VC</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>K2014</td></tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2552,7 +2626,7 @@
                                                             <tr><td>Q09</td><td>230V</td><td>09TO2021 - Prise nettoyeur HP local pont des treuil AV</td><td>H0210</td></tr>
                                                             <tr><td>QE1</td><td>400V</td><td>E1AO22A - Prise 400 V local pont des treuils AR</td><td>I0210</td></tr>
                                                             <tr><td>QE2</td><td>400V</td><td>E2AO22A - Prise 400 V local pont des treuils AV</td><td>H0210</td></tr>
-                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>/</td></tr>
+                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>I0213</td></tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2700,7 +2774,7 @@
                                                             <tr><td>QP1</td><td>400</td><td>P2AO5VA - Prise 400V Machine AR parquet sup</td><td>M2010</td></tr>
                                                             <tr><td>QP2</td><td>400</td><td>P3AO5VA - Prise 400V Aux AR Td</td><td>O2010</td></tr>
                                                             <tr><td>QP3</td><td>400</td><td>P4AO5VA - Prise 400V Aux AR Bd</td><td>O2010</td></tr>
-                                                            <tr><td><strong>S1</strong></td><td><strong>400</strong></td><td><strong>INTERRUPTEUR-SECTIONNEUR INS 250-160A</strong></td><td>/</td></tr>
+                                                            <tr><td><strong>S1</strong></td><td><strong>400</strong></td><td><strong>INTERRUPTEUR-SECTIONNEUR INS 250-160A</strong></td><td>M4010</td></tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -2859,7 +2933,7 @@
                                                             <tr><td>Q50</td><td>400V</td><td>FVA201 - Armoire principale frigo dechets fret</td><td>D0014</td></tr>
                                                             <tr><td>Q23</td><td>400V</td><td>VETSCUG502 - Unité autonome local convertisseur</td><td>M0012</td></tr>
                                                             <tr><td>Q24</td><td>400V</td><td>VETFCUG501 - Ventilo-convecteur TP2HT</td><td>M2013</td></tr>
-                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>/</td></tr>
+                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>M0064</td></tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -3436,7 +3510,7 @@
                                                             <tr><td>QO3</td><td>230V</td><td>O3AL4VA - Prises Machine AV parquet inf</td><td>L2022</td></tr>
                                                             <tr><td>QO4</td><td>230V</td><td>O4AL4VA - Prises Machine AV parquet inf</td><td>L2010</td></tr>
                                                             <tr><td>QO5</td><td>230V</td><td>O5AL4VA - Prises Machine AV parquet inf</td><td>L2010</td></tr>
-                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td></td></tr>
+                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>L4010</td></tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -3495,7 +3569,7 @@
                                                             <tr><td>QE5</td><td>230V</td><td>E5AL44A - Prise secrétariat cdt</td><td>L0425</td></tr>
                                                             <tr><td>QA8</td><td>400V</td><td>A8L44A - Alimentation chambre commissaire</td><td>L0416</td></tr>
                                                             <tr><td>Q03</td><td>230V</td><td>03TE4041 - TET 4031</td><td>L0331</td></tr>
-                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>/</td></tr>
+                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>L0421</td></tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -3635,7 +3709,7 @@
                                                             <tr><td>QE5</td><td>230V</td><td>E5AL3VA - Prises Escalier, SAS , machinerie monte munition</td><td>K0036 K0034 K0024</td></tr>
                                                             <tr><td>QE6</td><td>230V</td><td>E6AL3VA - Prises Centrale ventilation ACR 403H</td><td>K0023</td></tr>
                                                             <tr><td>Q01</td><td>230V</td><td>CACLCB0311 - Coffret de commande local FCU311</td><td>K0024</td></tr>
-                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>/</td></tr>
+                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>K4014</td></tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -3842,7 +3916,7 @@
                                                             <tr><td>QO1</td><td>230V</td><td>O1AL20A - Prises Echappée local pompe AR</td><td>I0032</td></tr>
                                                             <tr><td>QO2</td><td>230V</td><td>O2AL20A - Prises Echappée local pompe AV</td><td>G0012</td></tr>
                                                             <tr><td>QE5</td><td>230V</td><td>E5AL20A - Prises Hall manœuvre</td><td>F-K0110</td></tr>
-                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>/</td></tr>
+                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>G0032</td></tr>
                                                             <tr class="section-label-row"><td colspan="4">CELLULE B</td></tr>
                                                             <tr><td>QE6</td><td>230V</td><td>E6AL20A - Prises Accés air de RAM BD</td><td>k0112</td></tr>
                                                             <tr><td>QE7</td><td>230V</td><td>E7AL20A -Prises Local recharge transpalette AV, soute boisson fret Td, soute courrier fret, magasin RAM AR</td><td>G0023 H0015 I0013 J0013</td></tr>
@@ -4015,7 +4089,7 @@
                                                             <tr><td></td><td>230V</td><td>F2BL5SA - Prise Sanitaire</td><td>N1032</td></tr>
                                                             <tr><td>QM1</td><td>400V</td><td>M1L5SA - Alimentation postes</td><td>P1021</td></tr>
                                                             <tr><td>QM2</td><td>400V</td><td>M2L5SA - Alimentation postes</td><td>N1065</td></tr>
-                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>/</td></tr>
+                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>M1011</td></tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -4084,7 +4158,7 @@
                                                             <tr><td>QB1</td><td>400V</td><td>B1L54A - Borniers postes EME</td><td>M0555</td></tr>
                                                             <tr><td>Q07</td><td>230V</td><td>PIB simple CEM/NRBC</td><td>M0514</td></tr>
                                                             <tr><td>QC1</td><td>230V</td><td>G1AL54A-ELSN ACR 455H</td><td></td></tr>
-                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>/</td></tr>
+                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>M0472</td></tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -4177,7 +4251,7 @@
                                                             <tr><td>Q05</td><td>230V</td><td>05TFE2B - Fer à repasser haute performance</td><td>N0027</td></tr>
                                                             <tr><td>Q06</td><td>230V</td><td>06TFE2B - Machine A Laver M05A pont 02 / tranche 4</td><td></td></tr>
                                                             <tr><td>Q07</td><td>230V</td><td>07TFE2B - Seche Linge M05B pont 02 / tranche 4</td><td></td></tr>
-                                                            <tr><td>QS1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>/</td></tr>
+                                                            <tr><td>QS1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>N0011</td></tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -4295,7 +4369,7 @@
                                                             <tr><td>Q10</td><td>230V</td><td>TS000127 - Chargeur PEH bureau dirpont</td><td>N0261</td></tr>
                                                             <tr><td>Q11</td><td>230V</td><td>11TE6041 - Prise nettoyeur HP roof hangar avia</td><td>N0513/2</td></tr>
                                                             <tr><td>QE2</td><td>230V</td><td>E2AL64A - Prises hangar avia</td><td>N0210</td></tr>
-                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td></td></tr>
+                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>N0432</td></tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -4343,7 +4417,7 @@
                                                             <tr><td>Q01</td><td>230V</td><td>01TE5031 - Prises Nettoyeur HP Pass extérieur Td</td><td>M0319</td></tr>
                                                             <tr><td>Q02</td><td>230V</td><td>02TE5031 - Prises Nettoyeur HP Pass extérieur Bd</td><td>M0316</td></tr>
                                                             <tr><td>QA7</td><td>400V</td><td>A7L53A - Bornier postes</td><td>M0330</td></tr>
-                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>/</td></tr>
+                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>M0347</td></tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -4415,7 +4489,7 @@
                                                             <tr><td>QF4</td><td>230V</td><td>F4AL51A - Etuve + Sorbonne Studio TV</td><td>M0114 M0135</td></tr>
                                                             <tr><td>QD1</td><td>230V</td><td>D1L51A - Eclairage Soute vivres temp. Ambiante</td><td>N0110</td></tr>
                                                             <tr><td>QB8</td><td>400V</td><td>B8L51A - Bornier postes</td><td>M0054</td></tr>
-                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>/</td></tr>
+                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>P0121</td></tr>
                                                             <tr class="section-label-row"><td colspan="4">CELLULE B</td></tr>
                                                             <tr><td>Q01</td><td>230V</td><td>VETEHE505 - Chauffage elect logement zone de rassemblement</td><td>M0220 + SAS</td></tr>
                                                             <tr><td>Q02</td><td>230V</td><td>VETEHE506 - Chauffage elect logment zone froide</td><td>M0237</td></tr>
@@ -4898,7 +4972,7 @@
                                                             <tr><td>Q11</td><td>400V</td><td>PS050104 - Centrale hydraulique porte soute 5</td><td>K1022</td></tr>
                                                             <tr><td>Q13</td><td>400V</td><td>PS060104 - Centrale hydraulique porte soute 6</td><td>K1022</td></tr>
                                                             <tr><td>Q23</td><td>230V</td><td>IHP2385ZV - Vannes Prise de mer P.E</td><td>B2012</td></tr>
-                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>/</td></tr>
+                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>K2014</td></tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -4951,7 +5025,7 @@
                                                             <tr><td>QE6</td><td>230V</td><td>E6AT40A - PRISE PC NAVIRE</td><td>L0012</td></tr>
                                                             <tr><td></td><td>230V</td><td>E6BT40A - PRISE CELLULE MACOPS</td><td>L0036</td></tr>
                                                             <tr><td>QE7</td><td>230V</td><td>E7AT40A - BJ POUR PRISE CELLULE MACOPS</td><td>L0036</td></tr>
-                                                            <tr><td>S1</td><td>230V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>/</td></tr>
+                                                            <tr><td>S1</td><td>230V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>L0027</td></tr>
                                                             <tr class="section-label-row"><td colspan="4">CELLULE B</td></tr>
                                                             <tr><td>Q01</td><td>230V</td><td>TT1HT/01 - ALIM.CONT.COM. (FDM) LOCAL TERRE HT</td><td>L0014</td></tr>
                                                             <tr><td>Q02</td><td>230V</td><td>TVT45 - ARM.CONT.VAN.FER.RAP. COURSIVE</td><td>L0011</td></tr>
@@ -5094,7 +5168,7 @@
                                                             <tr><td>QE2</td><td>230V</td><td>E2AT43A - PC écran CCTV coursive chambre passagers</td><td>L0323</td></tr>
                                                             <tr><td>QB4</td><td>400V</td><td>TB4060 - Alimentation postes pont 4</td><td>L0416 L0426 L0436 L0446 L0456 L0435 L0445</td></tr>
                                                             <tr><td>QA8</td><td>400V</td><td>TB4027 - Alimentation postes infirmerie</td><td>L0212 L0211 L0213</td></tr>
-                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>/</td></tr>
+                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>L0331</td></tr>
                                                             <tr class="section-label-row"><td colspan="4">CELLULE B</td></tr>
                                                             <tr><td>Q02</td><td>230V</td><td>NN000103BJ - Récepteur GNSS militaire</td><td>M0612</td></tr>
                                                             <tr><td>Q03</td><td>230V</td><td>CNMT2 - Ecran GNSS militaire</td><td>L0610</td></tr>
@@ -5189,7 +5263,7 @@
                                                             <tr><td>Q22</td><td>230V</td><td>WK000033 - Boitier LED 2</td><td>L1030</td></tr>
                                                             <tr><td>Q23</td><td>230V</td><td>P00-0272 - PIB simple pc navire</td><td>L0012</td></tr>
                                                             <tr><td>Q24</td><td>230V</td><td>DCCSUR02 - Equipement surete provisoire pc navire</td><td>L0012</td></tr>
-                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>/</td></tr>
+                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>L1042</td></tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -6004,7 +6078,7 @@
                                                             <tr><td>Q19</td><td>230V</td><td>IHP640ZV - Vanne IHP</td><td>N0111</td></tr>
                                                             <tr><td>Q20</td><td>230V</td><td>IHP644ZV - Vanne IHP</td><td>pt00-tr5</td></tr>
                                                             <tr><td>Q21</td><td>230V</td><td>IHP645ZV - Vanne IHP</td><td>pt00-tr5</td></tr>
-                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>/</td></tr>
+                                                            <tr><td>S1</td><td>400V</td><td>INTERRUPTEUR-SECTIONNEUR INS 250-160A</td><td>M0025</td></tr>
                                                             <tr class="section-label-row"><td colspan="4">CELLULE B</td></tr>
                                                             <tr><td>Q22</td><td>230V</td><td>IHP652ZV - Vanne IHP</td><td>pt00-tr5</td></tr>
                                                             <tr><td>Q23</td><td>230V</td><td>IHP653ZV - Vanne IHP</td><td>pt00-tr5</td></tr>
@@ -9536,6 +9610,8 @@
         const incompleteLinesCount = document.getElementById('incompleteLinesCount');
         const incompleteLinesHint = document.getElementById('incompleteLinesHint');
         const incompleteLinesList = document.getElementById('incompleteLinesList');
+        const incompleteLinesSearch = document.getElementById('incompleteLinesSearch');
+        const clearIncompleteLinesSearch = document.getElementById('clearIncompleteLinesSearch');
         let incompleteLinesExpanded = false;
         let searchIndex = [];
         let currentSearchMatches = [];
@@ -9751,16 +9827,41 @@
             return item;
         }
 
+        function incompleteMatchHaystack(match) {
+            return [
+                match?.context?.domain,
+                match?.context?.table,
+                match?.data?.depart,
+                match?.data?.tension,
+                match?.data?.designation,
+                match?.data?.gisement
+            ].map(normalizeSearchText).join(' ');
+        }
+
         function refreshIncompleteLines() {
             if (!incompleteLinesPanel || !incompleteLinesList) return;
-            const incomplete = searchIndex.filter(match => isIncompleteLine(match.data) && !isIncompleteLineAccepted(match));
-            const count = incomplete.length;
-            incompleteLinesCount.textContent = count + (count > 1 ? ' lignes' : ' ligne');
-            incompleteLinesPanel.classList.toggle('complete', count === 0);
-            incompleteLinesPanel.classList.toggle('expanded', incompleteLinesExpanded);
-            incompleteLinesToggle.setAttribute('aria-expanded', incompleteLinesExpanded ? 'true' : 'false');
 
-            if (count === 0) {
+            const allIncomplete = searchIndex.filter(match => isIncompleteLine(match.data) && !isIncompleteLineAccepted(match));
+            const totalCount = allIncomplete.length;
+            const filterQuery = normalizeSearchText(incompleteLinesSearch?.value || '');
+            const filterActive = !!filterQuery;
+            const incomplete = filterActive
+                ? allIncomplete.filter(match => incompleteMatchHaystack(match).includes(filterQuery))
+                : allIncomplete;
+            const count = incomplete.length;
+
+            if (clearIncompleteLinesSearch) {
+                clearIncompleteLinesSearch.classList.toggle('open', filterActive);
+            }
+
+            incompleteLinesCount.textContent = filterActive
+                ? count + ' / ' + totalCount
+                : totalCount + (totalCount > 1 ? ' lignes' : ' ligne');
+            incompleteLinesPanel.classList.toggle('complete', totalCount === 0);
+            incompleteLinesPanel.classList.toggle('expanded', filterActive || incompleteLinesExpanded);
+            incompleteLinesToggle.setAttribute('aria-expanded', (filterActive || incompleteLinesExpanded) ? 'true' : 'false');
+
+            if (totalCount === 0) {
                 incompleteLinesExpanded = false;
                 incompleteLinesPanel.classList.remove('expanded');
                 incompleteLinesToggle.setAttribute('aria-expanded', 'false');
@@ -9769,23 +9870,43 @@
                 return;
             }
 
-            if (incompleteLinesExpanded) {
+            if (filterActive) {
+                incompleteLinesHint.textContent = count
+                    ? count + (count > 1 ? ' lignes trouvées' : ' ligne trouvée') + ' sur ' + totalCount
+                    : 'Aucune ligne incomplète ne correspond à cette recherche';
+            } else if (incompleteLinesExpanded) {
                 incompleteLinesHint.textContent = 'Toutes les lignes sont affichées · toucher ici pour replier';
-            } else if (count > 4) {
-                incompleteLinesHint.textContent = '4 lignes affichées sur ' + count + ' · toucher ici pour tout afficher';
+            } else if (totalCount > 4) {
+                incompleteLinesHint.textContent = '4 lignes affichées sur ' + totalCount + ' · toucher ici pour tout afficher';
             } else {
                 incompleteLinesHint.textContent = 'Champs obligatoires · aucun ? · gisement(s) au format A1234';
             }
 
             incompleteLinesList.innerHTML = '';
-            const visible = incompleteLinesExpanded ? incomplete : incomplete.slice(0, 4);
+            if (filterActive && count === 0) {
+                incompleteLinesList.innerHTML = '<div class="incomplete-lines-no-result">Aucun résultat dans les lignes incomplètes</div>';
+                return;
+            }
+
+            const visible = filterActive
+                ? incomplete
+                : (incompleteLinesExpanded ? incomplete : incomplete.slice(0, 4));
             visible.forEach(match => incompleteLinesList.appendChild(createIncompleteLineButton(match)));
         }
 
         incompleteLinesToggle.addEventListener('click', () => {
+            if (normalizeSearchText(incompleteLinesSearch?.value || '')) return;
             if (searchIndex.filter(match => isIncompleteLine(match.data) && !isIncompleteLineAccepted(match)).length <= 4 && !incompleteLinesExpanded) return;
             incompleteLinesExpanded = !incompleteLinesExpanded;
             refreshIncompleteLines();
+        });
+
+        incompleteLinesSearch?.addEventListener('input', refreshIncompleteLines);
+        incompleteLinesSearch?.addEventListener('search', refreshIncompleteLines);
+        clearIncompleteLinesSearch?.addEventListener('click', () => {
+            incompleteLinesSearch.value = '';
+            refreshIncompleteLines();
+            incompleteLinesSearch.focus({ preventScroll: true });
         });
 
         function revealSearchRow(row) {
