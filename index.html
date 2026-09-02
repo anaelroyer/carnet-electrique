@@ -176,62 +176,6 @@
             background: #166534;
             color: #dcfce7;
         }
-        .incomplete-lines-search-wrap {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            padding: 8px 9px;
-            border-bottom: 1px solid rgba(180,83,9,.32);
-            background: rgba(15,23,42,.42);
-        }
-        .incomplete-lines-panel.complete .incomplete-lines-search-wrap {
-            display: none;
-        }
-        .incomplete-lines-search {
-            flex: 1 1 auto;
-            min-width: 0;
-            height: 36px;
-            padding: 7px 10px;
-            border: 1px solid #475569;
-            border-radius: 8px;
-            background: #0f172a;
-            color: #f8fafc;
-            font: inherit;
-            font-size: .73rem;
-            font-weight: 650;
-            outline: none;
-        }
-        .incomplete-lines-search::placeholder { color: #94a3b8; }
-        .incomplete-lines-search:focus {
-            border-color: #f59e0b;
-            box-shadow: 0 0 0 2px rgba(245,158,11,.16);
-        }
-        .incomplete-lines-search-clear {
-            display: none;
-            flex: 0 0 auto;
-            align-items: center;
-            justify-content: center;
-            width: 34px;
-            height: 34px;
-            padding: 0;
-            border: 1px solid #475569;
-            border-radius: 8px;
-            background: #1e293b;
-            color: #e2e8f0;
-            font: inherit;
-            font-size: 1rem;
-            line-height: 1;
-            cursor: pointer;
-            touch-action: manipulation;
-        }
-        .incomplete-lines-search-clear.visible { display: inline-flex; }
-        .incomplete-lines-no-match {
-            padding: 10px 11px;
-            color: #cbd5e1;
-            font-size: .73rem;
-            font-weight: 700;
-            text-align: center;
-        }
         .incomplete-lines-list {
             display: flex;
             flex-direction: column;
@@ -355,9 +299,6 @@
             .incomplete-lines-title { font-size: .77rem; }
             .incomplete-lines-hint { font-size: .62rem; }
             .incomplete-lines-count { font-size: .65rem; }
-            .incomplete-lines-search-wrap { padding: 7px 8px; }
-            .incomplete-lines-search { height: 34px; font-size: .69rem; }
-            .incomplete-lines-search-clear { width: 32px; height: 32px; }
             .incomplete-line-item { min-height: 46px; }
             .incomplete-line-edit { padding: 7px 8px; }
             .incomplete-line-actions { padding: 5px 6px 5px 0; }
@@ -1890,10 +1831,6 @@
             </span>
             <span id="incompleteLinesCount" class="incomplete-lines-count">0</span>
         </button>
-        <div id="incompleteLinesSearchWrap" class="incomplete-lines-search-wrap">
-            <input type="search" id="incompleteLinesSearch" class="incomplete-lines-search" placeholder="Rechercher un tableau, une ligne…" autocomplete="off" inputmode="search" enterkeyhint="search" aria-label="Rechercher dans les lignes incomplètes">
-            <button type="button" id="clearIncompleteLinesSearchBtn" class="incomplete-lines-search-clear" aria-label="Effacer la recherche" title="Effacer la recherche">×</button>
-        </div>
         <div id="incompleteLinesList" class="incomplete-lines-list"></div>
     </section>
 
@@ -1972,7 +1909,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>L0331</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1O43A - Eclairage local EL infirmerie, morgue, DASRI</td><td>L0231 L0233 L0221</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2O43A - Eclairage cursive infirmerie, buanderie infirmerie, sanitaire</td><td>L0220 L0214 L0216</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2O43B - Eclairage cursive infirmerie, buanderie infirmerie, sanitaire</td><td>L0220 L0214 L0216</td></tr>
@@ -2024,7 +1961,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>230V</td><td>VPT - Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>230V</td><td>VPT - Voyant sous tension</td><td>L0027</td></tr>
                                                             <tr><td>Q01</td><td>230V</td><td>EP001051 - Ampli 1 boucle M5</td><td>H0015</td></tr>
                                                             <tr><td>Q02</td><td>230V</td><td>EP001052 - Ampli 1 boucle M5</td><td>H0015</td></tr>
                                                             <tr><td>Q03</td><td>230V</td><td>EP1001061 - Ampli 1 boucle M6</td><td>H0015</td></tr>
@@ -2072,7 +2009,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>L4010</td></tr>
                                                             <tr><td>Q01</td><td>230V</td><td>SSS100EB - Armoire contrôle MGPS AV (antifouling)</td><td>L4010</td></tr>
                                                             <tr><td>Q02</td><td>230V</td><td>RN1/H - Réchauffage résistance de neutre 1</td><td>L2010</td></tr>
                                                             <tr><td>Q03</td><td>230V</td><td>RN2/H - Réchauffage résistance de neutre 2</td><td>L2010</td></tr>
@@ -2128,7 +2065,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant JDB sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant JDB sous tension</td><td>L2022</td></tr>
                                                             <tr><td>QK1</td><td>230V</td><td>K1O4TA - Eclairage TP1HT</td><td>L2022</td></tr>
                                                             <tr><td>Q07</td><td>230V</td><td>O7AO4TA - Prises atelier SIC</td><td>L1034</td></tr>
                                                             <tr><td>Q08</td><td>230V</td><td>O8AO4TA - Prises bureau matériel, magasin consommable</td><td>L1010 L1012</td></tr>
@@ -2184,7 +2121,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>230V</td><td>VPT - JEU DE BARRE SOUS TENSION</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>230V</td><td>VPT - JEU DE BARRE SOUS TENSION</td><td>K0123</td></tr>
                                                             <tr><td>Q01</td><td>400V</td><td>AB000016 - AMC arret d'urgence avant</td><td>A0310</td></tr>
                                                             <tr><td>Q02</td><td>230V</td><td>TA000114BJ - Baie IPOP</td><td>M0514</td></tr>
                                                             <tr><td>Q03</td><td>230V</td><td>WK000007BJ1 - BJ Baie Data center 2 n°1 (DR)</td><td>L1030</td></tr>
@@ -2268,7 +2205,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>L2022</td></tr>
                                                             <tr><td>Q11</td><td>230V</td><td>VFT90F - Armoire fuite FF</td><td>N2010</td></tr>
                                                             <tr><td>Q12</td><td>230V</td><td>VACLCB0404 - Coffret de commande local FCU 404</td><td>L1030</td></tr>
                                                             <tr><td>Q13</td><td>230V</td><td>VACLCB0402 - Coffret de commande local FCU 402</td><td>L1013</td></tr>
@@ -2324,7 +2261,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>I0114</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1O21A - Eclairage hall manœuvre</td><td>K0110</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2O21A - Eclairage hall manœuvre</td><td>J0110 I0110 H0110 G0110 G0112 F0120</td></tr>
                                                             <tr><td>QA3</td><td>230V</td><td>A3O21A - Eclairage vestiaire manœuvre</td><td>I0116</td></tr>
@@ -2380,7 +2317,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>G0032</td></tr>
                                                             <tr><td>QE1</td><td>230V</td><td>E1A020A - BJ pour Prise PZ AV</td><td>C0110</td></tr>
                                                             <tr><td>QE3</td><td>230V</td><td>E3A020A-BJ pour Prises</td><td>C0110</td></tr>
                                                             <tr><td>Q01</td><td>230V</td><td>FVA0286EB - Armoire éclairage soute déchets fret</td><td>D0011</td></tr>
@@ -2441,7 +2378,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>115V</td><td>VPT - Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>115V</td><td>VPT - Voyant sous tension</td><td>L1042</td></tr>
                                                             <tr><td>Q01</td><td>115V</td><td>ND000102BJ1 - BJ SIDOP UNIT SPCC AR</td><td>M0471</td></tr>
                                                             <tr><td>Q02</td><td>115V</td><td>AB000105BJ - BJ Baie calculateur 40 mm AR</td><td>L0720</td></tr>
                                                             <tr><td>Q03</td><td>115V</td><td>03T15SC3 - Prise chargeur 115 V pass embarcation Bd SACPSNB115V</td><td>L0026</td></tr>
@@ -2475,7 +2412,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230</td><td>Voyant sous tension</td><td>L0027</td></tr>
                                                             <tr><td>QA1</td><td>230</td><td>A1O40AA - Eclairage PC MES</td><td>L0012</td></tr>
                                                             <tr><td>QA1</td><td>230</td><td>A1O40B - Eclairage PC MES</td><td>L0012</td></tr>
                                                             <tr><td>QA2</td><td>230</td><td>A2O40A - Eclairage PC MES</td><td>L0012</td></tr>
@@ -2546,7 +2483,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>K2014</td></tr>
                                                             <tr><td>Q01</td><td>230V</td><td>ITN3U1 - Baie distribution IT</td><td>K2014</td></tr>
                                                             <tr><td>Q02</td><td>400V</td><td>PM020506 - Coffret Coupure Pont roulant soute mun N°2</td><td>K4010</td></tr>
                                                             <tr><td>Q03</td><td>400V</td><td>PM030506 - Coffret Coupure Pont roulant soute mun N°3</td><td>K2020</td></tr>
@@ -2581,7 +2518,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>I0213</td></tr>
                                                             <tr><td>Q1</td><td>230V</td><td>Commande éclairage</td><td>/</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1O22CA - Eclairage aire de RAM Td</td><td>K0111 J0113 I0113 H0111 G0111</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2O22A - Eclairage aire de RAM Bd</td><td>K0112 J0114 I0118 H0112 G0114</td></tr>
@@ -2643,7 +2580,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>230V</td><td>VPT - PRESENCE TENSION JEU DE BARRE</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>230V</td><td>VPT - PRESENCE TENSION JEU DE BARRE</td><td>K0123</td></tr>
                                                             <tr><td>Q01</td><td>230V</td><td>NEN12HE01 - Fenêtre PC Carg</td><td>H0220</td></tr>
                                                             <tr><td>Q02</td><td>230V</td><td>NGN28HE01 - Fenêtre PC Carg</td><td>H0220</td></tr>
                                                             <tr><td>Q03</td><td>230V</td><td>NIN24HE01 - Fenêtre PC Carg</td><td>H0220</td></tr>
@@ -2710,7 +2647,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>230V</td><td>VPT - Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>230V</td><td>VPT - Voyant sous tension</td><td>N0432</td></tr>
                                                             <tr><td>Q01</td><td>400V</td><td>HH090105 - Armoire électrique porte hélicoptère</td><td>N0432 N0210</td></tr>
                                                             <tr><td>Q02</td><td>400V</td><td>HH090205 - Armoire électrique porte drone</td><td>N0432 N0210</td></tr>
                                                             <tr><td>Q03</td><td>230V</td><td>03TPE2A - RAM MANTIS (GFE)</td><td>N0210</td></tr>
@@ -2745,7 +2682,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230</td><td>Voyant sous tension</td><td>M4010</td></tr>
                                                             <tr><td>QK1</td><td>230</td><td>K1O5TA - Eclairage TP2HT</td><td>M2013</td></tr>
                                                             <tr><td>QO1</td><td>230</td><td>VEEBJAR - BJ contrôle volets cheminée AR</td><td>M1010</td></tr>
                                                             <tr><td>QO2</td><td>230</td><td>VEE2958BJ - BJ contrôle volets feu NRBC 2958 F</td><td>N3011</td></tr>
@@ -2791,7 +2728,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>230V</td><td>VPT - Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>230V</td><td>VPT - Voyant sous tension</td><td>P0027</td></tr>
                                                             <tr><td>Q01</td><td>230V</td><td>EP002011 - Ampli 1 boucle L1</td><td>P0121</td></tr>
                                                             <tr><td>Q02</td><td>230V</td><td>EP002021 - Ampli 1 boucle L2</td><td>M0145</td></tr>
                                                             <tr><td>Q03</td><td>230V</td><td>EP002031 - Ampli 1 boucle L3</td><td>M0472</td></tr>
@@ -2838,7 +2775,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>230V</td><td>VPT - jeu de barre sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>230V</td><td>VPT - jeu de barre sous tension</td><td>M0323</td></tr>
                                                             <tr><td>Q01</td><td>400V</td><td>TR380SC2 - Transfo SDC 400/380V Baie SSPA</td><td>M0323</td></tr>
                                                             <tr><td>Q02</td><td>230V</td><td>TB000003 - RIFAN Baie N°3</td><td>M0514</td></tr>
                                                             <tr><td>Q03</td><td>230V</td><td>TB000001 -RIFAN Baie N°1</td><td>M0514</td></tr>
@@ -2890,7 +2827,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>M0064</td></tr>
                                                             <tr><td>Q01</td><td>230V</td><td>01TO5002 - Unité de dépollution mobile local barre Td</td><td>Q1013</td></tr>
                                                             <tr><td>Q02</td><td>230V</td><td>FVA0182EB - Armoire éclairage ch. Negatives bord</td><td>Q0010</td></tr>
                                                             <tr><td>Q03</td><td>230V</td><td>FVA0184EB - Armoire éclairage ch. Positives bord</td><td>Q0024</td></tr>
@@ -2996,7 +2933,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>M1011</td></tr>
                                                             <tr><td>QK1</td><td>230V</td><td>K105SA - Eclairage Atelier élec, magasin rechanges</td><td>M1041 M1027</td></tr>
                                                             <tr><td>QK2</td><td>230V</td><td>K205SA - Eclairage local convertisseur, atelier machine, magasin machine</td><td>M1012 M1026 M1036</td></tr>
                                                             <tr><td>QE1</td><td>230V</td><td>E1AO5SA - BJ Prises salles convivialités</td><td>N1030 N1040 O1010 P1031</td></tr>
@@ -3063,7 +3000,7 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr class="section-label-row"><td colspan="4">CELLULE A</td></tr>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>M0633</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2O56A - Eclairage central opérations</td><td>L0621</td></tr>
                                                             <tr><td>QA5</td><td>230V</td><td>A5O56AA - Eclairage bureau OPS</td><td>M0616</td></tr>
                                                             <tr><td></td><td>230V</td><td>A5056BA - Eclairage PC OPS</td><td>L0632</td></tr>
@@ -3152,7 +3089,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230</td><td>Voyant sous tension</td><td>M2013</td></tr>
                                                             <tr><td>Q01</td><td>230</td><td>DPEINT3EB - Armoire interface DA 3</td><td>M2010</td></tr>
                                                             <tr><td>Q02</td><td>230</td><td>DPEINT4EB - Armoire interface DA 4</td><td>M2010</td></tr>
                                                             <tr><td>Q03</td><td>230</td><td>RN3 - Réchauffage résistance de neutre 3</td><td>M2010</td></tr>
@@ -3238,7 +3175,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>230V</td><td>VPT - Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>230V</td><td>VPT - Voyant sous tension</td><td>M0633</td></tr>
                                                             <tr><td>Q01</td><td>230V</td><td>MPEADUIW1 - Rack SB interface navigation</td><td>M0614</td></tr>
                                                             <tr><td>Q02</td><td>230V</td><td>MPEADUIW2 - Rack SB interface navigation</td><td>M0614</td></tr>
                                                             <tr><td>Q03</td><td>400V</td><td>TET5061</td><td>M0633</td></tr>
@@ -3330,7 +3267,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>Q0010</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1O50A - Eclairage usine frigo bord, cambuse, coqueron boissons bord, bureau commis, sanitaire</td><td>Q0035 P0020 Q0026 Q0036 Q0012</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1050B - Eclairage vestiaire</td><td>Q0028</td></tr>
                                                             <tr><td>QA3</td><td>230V</td><td>A3O50A - Eclairage cuisine</td><td>P0010</td></tr>
@@ -3384,7 +3321,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>N0432</td></tr>
                                                             <tr><td>Q1</td><td>230V</td><td>Commande pilotage zone rouge</td><td>/</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1O64A - Eclairage courisve avia, stockage poudre, distribution TR5, sas</td><td>N0311 N0281 N0283 N0272</td></tr>
                                                             <tr><td>QA3</td><td>230V</td><td>A3O64A - Eclairage passerelle avia</td><td>N0361</td></tr>
@@ -3486,7 +3423,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>L4010</td></tr>
                                                             <tr><td>QK1</td><td>230V</td><td>K1L4VA - Eclairage Machine AV parquet inf</td><td>L4010</td></tr>
                                                             <tr><td>QK2</td><td>230V</td><td>K2L4VA - Eclairage Machine AV parquet inf</td><td>L4010</td></tr>
                                                             <tr><td>QK3</td><td>230V</td><td>K3L4VA - Eclairage Machine AV parquet inf</td><td>L4010</td></tr>
@@ -3586,7 +3523,7 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr class="section-label-row"><td colspan="4">CELLULE A</td></tr>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>L0131</td></tr>
                                                             <tr><td>QK1</td><td>230V</td><td>K1L41A - Eclairage coursive BMAT</td><td>L1020</td></tr>
                                                             <tr><td>QK2</td><td>230V</td><td>K2L41A - Eclairage coursive BMAT</td><td>L1020</td></tr>
                                                             <tr><td>QK3</td><td>230V</td><td>K3L41A - Eclairage coursive BMAT</td><td>L1020</td></tr>
@@ -3675,7 +3612,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>K4014</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1L3VA - Eclairage SAS, escalier</td><td>K4012 K4014</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2L3VA - Eclairage soute N°2 fret</td><td>K4010</td></tr>
                                                             <tr><td>QA3</td><td>230V</td><td>A3L3VA - Eclairage soute N°1 fret</td><td>K4020</td></tr>
@@ -3726,7 +3663,7 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr class="section-label-row"><td colspan="4">CELLULE A</td></tr>
-                                                            <tr><td>Q0</td><td>230V</td><td>VPT - PRESENCE TENSION JEU DE BARRE</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>VPT - PRESENCE TENSION JEU DE BARRE</td><td>C0113</td></tr>
                                                             <tr><td>Q1</td><td>230V</td><td>Commande éclairage blanc</td><td>/</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1T21A - Eclairage blanc transit</td><td>J0110</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2T21A - Eclairage blanc transit</td><td>J0110</td></tr>
@@ -3873,7 +3810,7 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr class="section-label-row"><td colspan="4">CELLULE A</td></tr>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>G0032</td></tr>
                                                             <tr><td>Q1</td><td>230V</td><td>Commande éclairage</td><td>/</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1L20A - Eclairage Soute boissons fret Td, soute courriers fret, magasin ram AR</td><td>H0015 I0013 J0013</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2L20A - Eclairage soute ingrédients fret, soute rechanges divers, accès cuve, local compresseur ram AV, local recharge transpalette AV</td><td>D0013 D0023 E0013 E0023 G0013 G0023</td></tr>
@@ -3988,7 +3925,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>M4010</td></tr>
                                                             <tr><td>QK1</td><td>230V</td><td>K1L5VA - Eclairage Machine AR parquet inf</td><td>M4010</td></tr>
                                                             <tr><td>QK2</td><td>230V</td><td>K2L5VA - Eclairage Machine AR parquet inf</td><td>M4010</td></tr>
                                                             <tr><td>QK3</td><td>230V</td><td>K3L5VAAA - Eclairage Machine AR parquet inf</td><td>M4010</td></tr>
@@ -4034,7 +3971,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>M1011</td></tr>
                                                             <tr><td>Q1</td><td>230V</td><td>Commande éclairage</td><td>/</td></tr>
                                                             <tr><td>QK1</td><td>230V</td><td>K1L5SA - Eclairage Transfo AR</td><td>M1011</td></tr>
                                                             <tr><td></td><td>230V</td><td>K1L5SC - Eclairage Magasin rechanges</td><td>M1027</td></tr>
@@ -4105,7 +4042,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>M0472</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1L54A - Eclairage Roof simbad Td</td><td>M0655</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2L54A - Eclairage local EL Tim</td><td>M0633</td></tr>
                                                             <tr><td>QA3</td><td>230V</td><td>A3L54A - Eclairage sanitaire</td><td>M0632</td></tr>
@@ -4177,7 +4114,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>P0121</td></tr>
                                                             <tr><td>QE1</td><td>230V</td><td>E1AL5BA - Prises Buanderie principale</td><td>N0027</td></tr>
                                                             <tr><td>QE2</td><td>230V</td><td>E2AL5BA - Prises Carré officier</td><td>N0010</td></tr>
                                                             <tr><td>QE3</td><td>230V</td><td>E3AL5BA - Prises Carré officier</td><td>N0010</td></tr>
@@ -4232,7 +4169,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>230V</td><td>VPT - Jeu de Barre sous Tension</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>230V</td><td>VPT - Jeu de Barre sous Tension</td><td>N0011</td></tr>
                                                             <tr><td>Q01</td><td>400V</td><td>BU-M01 - Buanderie principale</td><td>N0027</td></tr>
                                                             <tr><td>Q02</td><td>230V</td><td>BU-M02 - Buanderie pont 10 / tranche 5</td><td>P1030</td></tr>
                                                             <tr><td>Q03</td><td>230V</td><td>BU-M03 - Buanderie pont 10 / tranche 5</td><td>N1035</td></tr>
@@ -4267,7 +4204,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>230V</td><td>VPT - Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>230V</td><td>VPT - Voyant sous tension</td><td>M1011</td></tr>
                                                             <tr><td>Q01</td><td>230V</td><td>ATM3A - Ponçeuse surfaceuse de sols Atelier machine</td><td>M1026</td></tr>
                                                             <tr><td>Q02</td><td>230V</td><td>02TFE2A - Prise fontaine dégraissage Atelier machine</td><td>M1026</td></tr>
                                                             <tr><td>Q03</td><td>230V</td><td>03TFEA2A - Prise fontaine dégraissage Machine AV</td><td>L4010</td></tr>
@@ -4318,7 +4255,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>N0432</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1L64AA - Eclairage coursive extérieure Td</td><td>N0315</td></tr>
                                                             <tr><td></td><td>230V</td><td>A1L64BA - Eclairage coursive extérieure Bd</td><td>N0316</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2L64A - Eclairage mezzanine DAS</td><td>N0415</td></tr>
@@ -4386,7 +4323,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>M0347</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1L53A - Eclairage Sas coursive vertrep</td><td>M0241</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2L53A - Eclairage Coopérative</td><td>M0245</td></tr>
                                                             <tr><td>QA4</td><td>230V</td><td>A4L53A Eclairage Coursive</td><td>M0330</td></tr>
@@ -4434,7 +4371,7 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr class="section-label-row"><td colspan="4">CELLULE A</td></tr>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>P0121</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1L51A - Eclairage Coursive principale</td><td>M-P00</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2L51A - Eclairage PZ AR</td><td>P0015</td></tr>
                                                             <tr><td>QA3</td><td>230V</td><td>A3L51A - Eclairage Carré équipage</td><td>O0012</td></tr>
@@ -4670,7 +4607,7 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr class="section-label-row"><td colspan="4">CELLULE A</td></tr>
-                                                            <tr><td>Q0</td><td>230V</td><td>voyant jeu de barre sous tension</td><td></td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>voyant jeu de barre sous tension</td><td>G0032</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1T20A -Eclairage blanc stockage huile usées, local EL SR AV, local compresseur AV, sas plage AV</td><td>D0115 C0113 D0111 C0111</td></tr>
                                                             <tr><td></td><td></td><td>A1T20B - Eclairage blanc PZ AV, echappée, local technique monte charge, local transpalette, magasin plage AV</td><td>C0110 D0110 C0122 D0112 D0114 C0112</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2T20A - Eclairage blanc Centrale ventilation ACR 412H</td><td>C0123</td></tr>
@@ -4773,7 +4710,7 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr class="section-label-row"><td colspan="4">CELLULE A</td></tr>
-                                                            <tr><td>Q0</td><td>230V</td><td>VPT - PRESENCE TENSION JEU DE BARRE</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>VPT - PRESENCE TENSION JEU DE BARRE</td><td>K0123</td></tr>
                                                             <tr><td>Q1</td><td>230V</td><td>Commande éclairage blanc</td><td>/</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1T21A - Eclairage blanc transit</td><td>J0110</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2T21A - Eclairage blanc transit</td><td>J0110</td></tr>
@@ -4919,7 +4856,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>K2014</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1T3TA - Eclairage blanc Centrale ventilation ACR 523H</td><td>K2014</td></tr>
                                                             <tr><td></td><td>230V</td><td>A1T3TB - Eclairage blanc SAS, escaliers, soute manutention</td><td>K2022 K2024 K2012 K4014 K4012</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2T3TA - Eclairage soute munition N°2 fret</td><td>K4010</td></tr>
@@ -4989,7 +4926,7 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr class="section-label-row"><td colspan="4">CELLULE A</td></tr>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>L0027</td></tr>
                                                             <tr><td>Q1</td><td>230V</td><td>Commande éclairage</td><td>/</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1T40A - ECLAIRAGE BLANC LOCAL EL</td><td>L0027</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2T40A - ECLAIRAGE BLANC LOCAL EL</td><td>L0027</td></tr>
@@ -5136,7 +5073,7 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr class="section-label-row"><td colspan="4">CELLULE A</td></tr>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>L0331</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A2L44A - Eclairage rouge coursive VERTREP</td><td>L0217 M0219 N0215</td></tr>
                                                             <tr><td>QA3</td><td>230V</td><td>A1L44BAA - Eclairage rouge local mousse soutes à munitions, escaliers, coursive</td><td>L0215 L0223 L0232 L0220</td></tr>
                                                             <tr><td></td><td>230V</td><td>A4T43B - Eclairage blanc</td><td>L0422</td></tr>
@@ -5215,7 +5152,7 @@
                                                             <tr><th>Départ</th><th>Tension</th><th>Désignation</th><th>Gisement</th></tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>L1042</td></tr>
                                                             <tr><td>QK1</td><td>230V</td><td>K1T4SA - Eclairage blanc Machine AV parquet sup Bd</td><td>L2010 L2012</td></tr>
                                                             <tr><td>QK2</td><td>230V</td><td>K2T4SA - Eclairage blanc Machine AV parquet sup Td</td><td>L2010</td></tr>
                                                             <tr><td>QK3</td><td>230V</td><td>K3T4SA - Eclairage blanc TP1HT</td><td>L2022</td></tr>
@@ -5274,7 +5211,7 @@
                                                             <tr><th>Départ</th><th>Tension</th><th>Désignation</th><th>Gisement</th></tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>L4010</td></tr>
                                                             <tr><td>QK1</td><td>230V</td><td>K1T4VA - Eclairage Machine AV parquet inf</td><td>L4010</td></tr>
                                                             <tr><td>QK2</td><td>230V</td><td>K2T4VA - Eclairage Machine AV parquet sup</td><td>L2010</td></tr>
                                                             <tr><td>QO1</td><td>230V</td><td>VFT90C - Armoire com. Fuite FF frigo-air</td><td>L4010</td></tr>
@@ -5339,7 +5276,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>M0021</td></tr>
                                                             <tr><td>Q1</td><td>230V</td><td>Commande Pilotage Zone Rouge</td><td>/</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1T50A - Eclairage blanc pass FRB</td><td>M0116</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2T50A - Eclairage rouge pass FRB</td><td>M0116</td></tr>
@@ -5409,7 +5346,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>M0347</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1T53A - Eclairage blanc sas coursive vertrep, zone de rassemblement, sas FRB, échappée</td><td>M0241 M0220 M0214 M0221</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2T53A - Eclairage blanc Local brassières, sas décontamination, coopérative, coursive coopérative, sanitaire, salle de sport, local mousse avia</td><td>M0251 M0215 M0227 M0237 M0213 M0223 M0245 M0222 M0226</td></tr>
                                                             <tr><td>QA3</td><td>230V</td><td>A3T53A - Eclairage rouge sas coursive vertrep, zone de rassemblement, échappée, sas FRB</td><td>M0241 M0220 M0214 M0221</td></tr>
@@ -5468,7 +5405,7 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr class="section-label-row"><td colspan="4">CELLULE A</td></tr>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>M0472</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1T54A - Eclairage blanc échappées, coursives</td><td>M0421 M0412 M0413 L0413 L0414 L0422</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2T54A - Eclairage rouge échappées, coursives</td><td>M0421 M0412 M0413 L0413 L0414 L0422</td></tr>
                                                             <tr><td>QA3</td><td>230V</td><td>A3T54A - Eclairage blanc local EL HF, local El SDC 115V</td><td>M0471 M0472</td></tr>
@@ -5574,9 +5511,9 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr class="section-label-row"><td colspan="4">CELLULE A</td></tr>
-                                                            <tr><td>QVPT NOR</td><td>230V</td><td>Voyant présence tension normal</td><td>/</td></tr>
-                                                            <tr><td>QVPT SEC</td><td>230V</td><td>Voyant présence tension secours</td><td>/</td></tr>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>QVPT NOR</td><td>230V</td><td>Voyant présence tension normal</td><td>M0633</td></tr>
+                                                            <tr><td>QVPT SEC</td><td>230V</td><td>Voyant présence tension secours</td><td>M0633</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>M0633</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1T56A - Eclairage blanc local EL SR TIM</td><td>M0633</td></tr>
                                                             <tr><td></td><td>230V</td><td>A1T56BA - Eclairage blanc local IFF / Local technique NAV</td><td>M0612 M0614</td></tr>
                                                             <tr><td>QA2</td><td>230V</td><td>A2T56AA - Eclairage blanc bureau opérations</td><td>M0616</td></tr>
@@ -5787,7 +5724,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>M1011</td></tr>
                                                             <tr><td>QK1</td><td>230V</td><td>K1T5SA - Eclairage blanc Transfo AR</td><td>M1011</td></tr>
                                                             <tr><td></td><td>230V</td><td>K1T5SB - Eclairage blanc porte embarquement</td><td>M1037</td></tr>
                                                             <tr><td>QK2</td><td>230V</td><td>K2T5SA - Eclairage blanc Coursive atelier</td><td>M1030</td></tr>
@@ -5850,7 +5787,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>M2013</td></tr>
                                                             <tr><td>QK1</td><td>230V</td><td>K1T5TA - Eclairage Machine AR</td><td>M4010</td></tr>
                                                             <tr><td>QK2</td><td>230V</td><td>K2T5TA - Eclairage Machine AR</td><td>M4010</td></tr>
                                                             <tr><td>QK3</td><td>230V</td><td>K3T5TA - Eclairage Machine AR</td><td>M2010</td></tr>
@@ -5904,7 +5841,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>N0432</td></tr>
                                                             <tr><td>Q1</td><td>230V</td><td>Commande éclairage blanc / rouge</td><td>/</td></tr>
                                                             <tr><td>Q2</td><td>230V</td><td>commande éclairage rouge</td><td>/</td></tr>
                                                             <tr><td>QA1</td><td>230V</td><td>A1T64A - Eclairage blanc coursive avia, échappée, local ditribution TR5</td><td>N0311 N0273 N0283</td></tr>
@@ -5969,7 +5906,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>N0322</td></tr>
                                                             <tr><td>QE1</td><td>230V</td><td>E1AT63A - Prises zone réservée avia</td><td>N0210</td></tr>
                                                             <tr><td>QE2</td><td>230V</td><td>E2AT63A - Prise bureau dirpont</td><td>N0261</td></tr>
                                                             <tr><td>QE3</td><td>230V</td><td>E3AT64A - Prise passerelle avia</td><td>N0361</td></tr>
@@ -6039,7 +5976,7 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr class="section-label-row"><td colspan="4">CELLULE A</td></tr>
-                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q0</td><td>230V</td><td>Voyant sous tension</td><td>M0025</td></tr>
                                                             <tr><td>QE1</td><td>230V</td><td>E1AT5AA - Prises lave batterie</td><td>P0012</td></tr>
                                                             <tr><td></td><td>230V</td><td>E1BT5AA - Prises coursive</td><td>M0013</td></tr>
                                                             <tr><td>QE2</td><td>230V</td><td>E2AT5AA - Prises coursive</td><td>M0013</td></tr>
@@ -6268,7 +6205,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>440</td><td>Voyant JDB sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>440</td><td>Voyant JDB sous tension</td><td>L2022</td></tr>
                                                             <tr><td>Q01</td><td>440</td><td>CCC13A - Purificateur MGO AV</td><td>I4010</td></tr>
                                                             <tr><td>Q02</td><td>440</td><td>CMM30AEB - Filtre auto MGO DA 1/2</td><td>L4010</td></tr>
                                                             <tr><td>Q03</td><td>440</td><td>DAA54AMOD - Osmoseur A</td><td>N2010</td></tr>
@@ -6319,7 +6256,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>440</td><td>VPT - Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>440</td><td>VPT - Voyant sous tension</td><td>C0113</td></tr>
                                                             <tr><td>Q01</td><td>440</td><td>SP8S2SPP - Demarreur chariot de réception solide</td><td>G0114</td></tr>
                                                             <tr><td>Q02</td><td>440</td><td>DEMMS27 - Palan électrique accès pompe AR</td><td>I0011</td></tr>
                                                             <tr><td>Q03</td><td>440</td><td>MAVC001 - Armoire guindeau Bd plage AV</td><td>B0014</td></tr>
@@ -6447,7 +6384,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>440</td><td>Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>440</td><td>Voyant sous tension</td><td>H0016</td></tr>
                                                             <tr><td>Q01</td><td>440</td><td>SP8S3ACP - Compresseur RAM AV</td><td>G0013</td></tr>
                                                             <tr><td>Q02</td><td>440</td><td>VEE01H - Réchauffeur local PE</td><td>B2010</td></tr>
                                                             <tr><td>Q03</td><td>440</td><td>VEE02H - Réchauffeur local PE</td><td>B2010</td></tr>
@@ -6490,7 +6427,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>440</td><td>VPT - Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>440</td><td>VPT - Voyant sous tension</td><td>L0131</td></tr>
                                                             <tr><td>Q01</td><td>440</td><td>SBB30AMO - Unité de préchauffage ED DA2</td><td>L4010</td></tr>
                                                             <tr><td>Q02</td><td>440</td><td>PCECTR2 - Armoire PCCI milieu</td><td>L4010</td></tr>
                                                             <tr><td>Q03</td><td>440</td><td>EC1HT - Enrouleur câble HT local Terre Bd</td><td>L0014</td></tr>
@@ -6615,7 +6552,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>440</td><td>VPT - Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>440</td><td>VPT - Voyant sous tension</td><td>C0113</td></tr>
                                                             <tr><td>Q01</td><td>440</td><td>Prise de courant 32 A N°1</td><td>C0113</td></tr>
                                                             <tr><td>Q02</td><td>440</td><td>Prise de courant 32 A N°2</td><td>C0113</td></tr>
                                                             <tr><td>Q03</td><td>440</td><td>Prise de courant 32 A N°3</td><td>C0113</td></tr>
@@ -6800,7 +6737,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>440</td><td>VPT - Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>440</td><td>VPT - Voyant sous tension</td><td>P0121</td></tr>
                                                             <tr><td>Q01</td><td>440</td><td>SP8S6AWP - Treuil de RAM en flèche Plage AR (non installé)</td><td>Q0110</td></tr>
                                                             <tr><td>Q02</td><td>440</td><td>LVSSBEL - Grue 3T Td</td><td>K0210</td></tr>
                                                             <tr><td>Q03</td><td>440</td><td>SACPSFRBEL - Bossoir FRB</td><td>M0116</td></tr>
@@ -6839,7 +6776,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>440</td><td>VPT - Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>440</td><td>VPT - Voyant sous tension</td><td>M2013</td></tr>
                                                             <tr><td>Q01</td><td>440</td><td>CCC13B - Purificateurs MGO</td><td>N4010</td></tr>
                                                             <tr><td>Q02</td><td>440</td><td>CMM30BEB - Filtre auto machine arrière</td><td>M4010</td></tr>
                                                             <tr><td>Q03</td><td>440</td><td>DAA54B - Osmoseur B</td><td>N2010</td></tr>
@@ -7069,7 +7006,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>440</td><td>VPT - Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>440</td><td>VPT - Voyant sous tension</td><td>M2013</td></tr>
                                                             <tr><td>Q01</td><td>440</td><td>LVSPSEL - Grue 3T Bd</td><td>K0210</td></tr>
                                                             <tr><td>Q03</td><td>440</td><td>DNT23EB - Armoire de contrôle DNT2/3EB</td><td>L2010</td></tr>
                                                             <tr><td>Q04</td><td>440</td><td>CMM24BM01EB - Armoire pompe de pressurisation MGO DA 3/4</td><td>N2027</td></tr>
@@ -7295,7 +7232,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>230</td><td>VPT - PRESENCE TENSION JEU DE BARRE</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>230</td><td>VPT - PRESENCE TENSION JEU DE BARRE</td><td>K0123</td></tr>
                                                             <tr><td>Q01</td><td>230</td><td>NEN12HE01 - Fenêtre PC Carg</td><td>H0220</td></tr>
                                                             <tr><td>Q02</td><td>230</td><td>NGN28HE01 - Fenêtre PC Carg</td><td>H0220</td></tr>
                                                             <tr><td>Q03</td><td>230</td><td>NIN24HE01 - Fenêtre PC Carg</td><td>H0220</td></tr>
@@ -7366,7 +7303,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-<tr><td>Q00</td><td>230V</td><td>VPT - Voyant sous tension</td><td>/</td></tr>
+<tr><td>Q00</td><td>230V</td><td>VPT - Voyant sous tension</td><td>M0633</td></tr>
                                                             <tr><td>Q01</td><td>230V</td><td>MPEADUIW1 - Rack SB interface navigation</td><td>M0614</td></tr>
                                                             <tr><td>Q02</td><td>230V</td><td>MPEADUIW2 - Rack SB interface navigation</td><td>M0614</td></tr>
                                                             <tr><td>Q03</td><td>400V</td><td>TET5061</td><td>M0633</td></tr>
@@ -7497,7 +7434,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>115</td><td>VPT - JEU DE BARRE SOUS TENSION</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>115</td><td>VPT - JEU DE BARRE SOUS TENSION</td><td>K0123</td></tr>
                                                             <tr><td>Q01</td><td>115</td><td>TR000003BJ - Baie HF simple Tx secours BHF03</td><td>I0211</td></tr>
                                                             <tr><td>Q02</td><td>115</td><td>ND000102BJ2 - SIDOP unit SPCC</td><td>M0471</td></tr>
                                                             <tr><td>Q03</td><td>115</td><td>GT200011BJ - Prise ROEM 1</td><td>L0533</td></tr>
@@ -7528,7 +7465,7 @@
                                                     <table>
                                                         <thead><tr><th>Départ</th><th>Tension</th><th>Désignation</th><th>Gisement</th></tr></thead>
                                                         <tbody>
-                                                            <tr><td>Q00</td><td>230</td><td>VPT - Voyant sous tension</td><td>/</td></tr>
+                                                            <tr><td>Q00</td><td>230</td><td>VPT - Voyant sous tension</td><td>K0123</td></tr>
                                                             <tr><td>Q01</td><td>230</td><td>WT000001BJ1 - BJ Baie Data Center 1 n°1</td><td>L0621</td></tr>
                                                             <tr><td>Q02</td><td>230</td><td>WT000001BJ2 - BJ Baie Data Center 1 n°1</td><td>L0621</td></tr>
                                                             <tr><td>Q03</td><td>230</td><td>AP200012 - Convertisseur de tension ENL Td</td><td>B0310</td></tr>
@@ -7714,7 +7651,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr><td>Q00</td><td>230</td><td>VPT - Voyant sous tension</td><td>/</td></tr>
+                                        <tr><td>Q00</td><td>230</td><td>VPT - Voyant sous tension</td><td>L0027</td></tr>
                                         <tr><td>Q01</td><td>230</td><td>ACC2001</td><td>G0032</td></tr>
                                         <tr><td>Q02</td><td>230</td><td>ACC2021</td><td>I0213</td></tr>
                                         <tr><td>Q03</td><td>230</td><td>ACR2001</td><td>F0011</td></tr>
@@ -7798,7 +7735,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr><td>Q00</td><td>230</td><td>VPT - Voyant sous tension</td><td>/</td></tr>
+                                        <tr><td>Q00</td><td>230</td><td>VPT - Voyant sous tension</td><td>P0121</td></tr>
                                         <tr><td>Q01</td><td>230</td><td>AEC5001</td><td>M0064</td></tr>
                                         <tr><td>Q02</td><td>230</td><td>AEC5061</td><td>M0633</td></tr>
                                         <tr><td>Q03</td><td>230</td><td>AER5064</td><td>L0620</td></tr>
@@ -7879,7 +7816,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr><td>Q00TPEH</td><td>230V</td><td>VPT - Voyant sous tension</td><td>/</td></tr>
+                                        <tr><td>Q00TPEH</td><td>230V</td><td>VPT - Voyant sous tension</td><td>L0231</td></tr>
                                         <tr class="hospital-redirect-row" onclick="scrollToTpehVitalHopital()"><td>Q01TPEH</td><td>400V</td><td>ASIH - ASI Hôpital</td><td>L0231</td></tr>
                                         <tr><td>Q02TPEH</td><td>230V</td><td>OSH12 - Lit d'examen</td><td>L0238</td></tr>
                                         <tr><td>Q03TPEH</td><td>230V</td><td>E1AH42A - Prises salle de soin</td><td>L0238</td></tr>
@@ -7920,7 +7857,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr><td>Q00EH</td><td>230</td><td>VPT - Voyant sous tension</td><td>/</td></tr>
+                                        <tr><td>Q00EH</td><td>230</td><td>VPT - Voyant sous tension</td><td>L0231</td></tr>
                                         <tr><td>QCPI</td><td>230</td><td>CPI</td><td>/</td></tr>
                                         <tr><td>Q01EH</td><td>230</td><td>MORGU3 - morgue 3 corps négative</td><td>L0233</td></tr>
                                         <tr><td>Q02EH</td><td>230</td><td>MORGU6 - morgue 6 corps positive</td><td>L0233</td></tr>
@@ -7977,7 +7914,7 @@
 </tr>
 </thead>
 <tbody>
-<tr><td>Q00</td><td>115</td><td>VPT - Voyant presence tension jeu de barre</td><td>/</td></tr>
+<tr><td>Q00</td><td>115</td><td>VPT - Voyant presence tension jeu de barre</td><td>M0323</td></tr>
 <tr><td>Q01</td><td>115</td><td>AE000001 - Console LCMA</td><td>L0621</td></tr>
 <tr><td>Q02</td><td>115</td><td>DI000001BJ - Baie IFF NG</td><td>M0633</td></tr>
 <tr><td>Q03</td><td>115</td><td>ND000002BJ2 - SIDOP UNIT SPCC</td><td>L1P10</td></tr>
@@ -8001,14 +7938,14 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr><td>QS1 TR380SC2</td><td>115</td><td>TR380SC2 - Transformateur Systéme de Combat 400/380 V</td><td>M0323</td></tr>
-                                                            <tr><td>Q00 TR380SC2</td><td>115</td><td>VPT - Présence Tension Jeu de Barres TR380SC2</td><td>/</td></tr>
+                                                            <tr><td>Q00 TR380SC2</td><td>115</td><td>VPT - Présence Tension Jeu de Barres TR380SC2</td><td>L0720</td></tr>
                                                             <tr><td>Q01</td><td>115</td><td>TL000001BJ2 - SYRACUSE_Baie SSPA</td><td>pt7/tr5</td></tr>
                                                             <tr><td>QS1 T115SC2</td><td>115</td><td>T115SC2 - Tableau Systéme de combat transitoire 115 V</td><td>M0323</td></tr>
-                                                            <tr><td>Q00 T11SC2</td><td>115</td><td>VPT - Présence Tension Jeu de Barres T115SC2</td><td>/</td></tr>
+                                                            <tr><td>Q00 T11SC2</td><td>115</td><td>VPT - Présence Tension Jeu de Barres T115SC2</td><td>L0720</td></tr>
                                                             <tr><td>Q04</td><td>115</td><td>TL000001BJ3 - BJ SYRACUSE_Baie SSPA</td><td>pt7/tr5</td></tr>
                                                             <tr><td>Q03</td><td>115</td><td>TL000002BJ2 - BJ SYRACUSE_Baie CORE</td><td>pt7/tr5</td></tr>
                                                             <tr><td>QS1 T115SC4</td><td>115</td><td>T115SC4 - Tableau Systéme de combat transitoire 115 V</td><td>M0472</td></tr>
-                                                            <tr><td>Q00 T11SC4</td><td>115</td><td>VPT - Présence Tension Jeu de Barres T115SC4</td><td>/</td></tr>
+                                                            <tr><td>Q00 T11SC4</td><td>115</td><td>VPT - Présence Tension Jeu de Barres T115SC4</td><td>L0720</td></tr>
                                                             <tr><td>Q02</td><td>115</td><td>TL000001BJ1 - BJ SYRACUSE_Baie SSPA</td><td>pt7/tr5</td></tr>
                                                             <tr><td>Q05</td><td>115</td><td>TL000002BJ1 - BJ SYRACUSE_Baie Core</td><td>pt7/tr5</td></tr>
                                                             <tr><td>Q41 TET5SC2</td><td>230</td><td>alimentation 230V depuis tableau TET5SC2</td><td>/</td></tr>
@@ -8038,9 +7975,9 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr><td>QS1 T115SC2</td><td>115</td><td>T115SC2 - Tableau systéme de combat transitoire 115 V</td><td>/</td></tr>
-                                                            <tr><td>Q00T115SC2</td><td>115</td><td>VPT - présence tension jeu de barre T115SC2</td><td>/</td></tr>
+                                                            <tr><td>Q00T115SC2</td><td>115</td><td>VPT - présence tension jeu de barre T115SC2</td><td>L0534</td></tr>
                                                             <tr><td>QS1 T115SC4</td><td>115</td><td>T115SC4 - Tableau systéme de combat transitoire 115 V</td><td>/</td></tr>
-                                                            <tr><td>Q00T115SC4</td><td>115</td><td>VPT - présence tension jeu de barre T115SC4</td><td>/</td></tr>
+                                                            <tr><td>Q00T115SC4</td><td>115</td><td>VPT - présence tension jeu de barre T115SC4</td><td>L0534</td></tr>
                                                             <tr><td>Q01</td><td>115</td><td>TL000004 - SYRACUSE_Baie Réseau local tech SIC</td><td>pt5/tr5</td></tr>
                                                             <tr><td>Q02</td><td>115</td><td>TL000005 - SYRACUSE_Baie MODEM local tech SC/D</td><td>pt5/tr5</td></tr>
                                                             <tr><td>Q03</td><td>115</td><td>TL000006 - SYRACUSE_Baie USAGER local tech SIC</td><td>pt5/tr5</td></tr>
@@ -8096,7 +8033,7 @@
 </tr>
 </thead>
 <tbody>
-<tr><td>Q00</td><td>115V</td><td>Voyant sous tension</td><td>/</td></tr>
+<tr><td>Q00</td><td>115V</td><td>Voyant sous tension</td><td>M0472</td></tr>
 <tr><td>Q01</td><td>115V</td><td>ND000002 - SIDOP unit SPCC AV</td><td>L1P10</td></tr>
 <tr><td>Q02</td><td>115V</td><td>AB000005 - Baie calculateur 40mm AV</td><td>L0720</td></tr>
 <tr><td>Q03</td><td>115V</td><td>DI000203 - ADSB Convertisseur</td><td>M0514</td></tr>
@@ -8116,14 +8053,14 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr><td>QS1 TR380SC2</td><td>115</td><td>TR380SC2 - Transformateur Systéme de Combat 400/380 V</td><td>M0323</td></tr>
-                                                            <tr><td>Q00 TR380SC2</td><td>115</td><td>VPT - Présence Tension Jeu de Barres TR380SC2</td><td>/</td></tr>
+                                                            <tr><td>Q00 TR380SC2</td><td>115</td><td>VPT - Présence Tension Jeu de Barres TR380SC2</td><td>L0720</td></tr>
                                                             <tr><td>Q01</td><td>115</td><td>TL000001BJ2 - SYRACUSE_Baie SSPA</td><td>pt7/tr5</td></tr>
                                                             <tr><td>QS1 T115SC2</td><td>115</td><td>T115SC2 - Tableau Systéme de combat transitoire 115 V</td><td>M0323</td></tr>
-                                                            <tr><td>Q00 T11SC2</td><td>115</td><td>VPT - Présence Tension Jeu de Barres T115SC2</td><td>/</td></tr>
+                                                            <tr><td>Q00 T11SC2</td><td>115</td><td>VPT - Présence Tension Jeu de Barres T115SC2</td><td>L0720</td></tr>
                                                             <tr><td>Q04</td><td>115</td><td>TL000001BJ3 - BJ SYRACUSE_Baie SSPA</td><td>pt7/tr5</td></tr>
                                                             <tr><td>Q03</td><td>115</td><td>TL000002BJ2 - BJ SYRACUSE_Baie CORE</td><td>pt7/tr5</td></tr>
                                                             <tr><td>QS1 T115SC4</td><td>115</td><td>T115SC4 - Tableau Systéme de combat transitoire 115 V</td><td>M0472</td></tr>
-                                                            <tr><td>Q00 T11SC4</td><td>115</td><td>VPT - Présence Tension Jeu de Barres T115SC4</td><td>/</td></tr>
+                                                            <tr><td>Q00 T11SC4</td><td>115</td><td>VPT - Présence Tension Jeu de Barres T115SC4</td><td>L0720</td></tr>
                                                             <tr><td>Q02</td><td>115</td><td>TL000001BJ1 - BJ SYRACUSE_Baie SSPA</td><td>pt7/tr5</td></tr>
                                                             <tr><td>Q05</td><td>115</td><td>TL000002BJ1 - BJ SYRACUSE_Baie Core</td><td>pt7/tr5</td></tr>
                                                             <tr><td>Q41 TET5SC2</td><td>230</td><td>alimentation 230V depuis tableau TET5SC2</td><td>/</td></tr>
@@ -8153,9 +8090,9 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr><td>QS1 T115SC2</td><td>115</td><td>T115SC2 - Tableau systéme de combat transitoire 115 V</td><td>/</td></tr>
-                                                            <tr><td>Q00T115SC2</td><td>115</td><td>VPT - présence tension jeu de barre T115SC2</td><td>/</td></tr>
+                                                            <tr><td>Q00T115SC2</td><td>115</td><td>VPT - présence tension jeu de barre T115SC2</td><td>M0514</td></tr>
                                                             <tr><td>QS1 T115SC4</td><td>115</td><td>T115SC4 - Tableau systéme de combat transitoire 115 V</td><td>/</td></tr>
-                                                            <tr><td>Q00T115SC4</td><td>115</td><td>VPT - présence tension jeu de barre T115SC4</td><td>/</td></tr>
+                                                            <tr><td>Q00T115SC4</td><td>115</td><td>VPT - présence tension jeu de barre T115SC4</td><td>M0514</td></tr>
                                                             <tr><td>Q01</td><td>115</td><td>TL000004 - SYRACUSE_Baie Réseau local tech SIC</td><td>pt5/tr5</td></tr>
                                                             <tr><td>Q02</td><td>115</td><td>TL000005 - SYRACUSE_Baie MODEM local tech SC/D</td><td>pt5/tr5</td></tr>
                                                             <tr><td>Q03</td><td>115</td><td>TL000006 - SYRACUSE_Baie USAGER local tech SIC</td><td>pt5/tr5</td></tr>
@@ -9598,12 +9535,8 @@
         const incompleteLinesToggle = document.getElementById('incompleteLinesToggle');
         const incompleteLinesCount = document.getElementById('incompleteLinesCount');
         const incompleteLinesHint = document.getElementById('incompleteLinesHint');
-        const incompleteLinesSearchWrap = document.getElementById('incompleteLinesSearchWrap');
-        const incompleteLinesSearch = document.getElementById('incompleteLinesSearch');
-        const clearIncompleteLinesSearchBtn = document.getElementById('clearIncompleteLinesSearchBtn');
         const incompleteLinesList = document.getElementById('incompleteLinesList');
         let incompleteLinesExpanded = false;
-        let incompleteLinesSearchQuery = '';
         let searchIndex = [];
         let currentSearchMatches = [];
         let searchPrintOpenStates = [];
@@ -9818,41 +9751,17 @@
             return item;
         }
 
-        function incompleteLineSearchText(match) {
-            return normalizeSearchText([
-                match?.context?.domain,
-                match?.context?.table,
-                match?.data?.depart,
-                match?.data?.tension,
-                match?.data?.designation,
-                match?.data?.gisement
-            ].filter(Boolean).join(' '));
-        }
-
         function refreshIncompleteLines() {
             if (!incompleteLinesPanel || !incompleteLinesList) return;
             const incomplete = searchIndex.filter(match => isIncompleteLine(match.data) && !isIncompleteLineAccepted(match));
             const count = incomplete.length;
-            const query = normalizeSearchText(incompleteLinesSearchQuery);
-            const filtered = query
-                ? incomplete.filter(match => incompleteLineSearchText(match).includes(query))
-                : incomplete;
-            const visibleCount = filtered.length;
-            const searchActive = !!query;
-
-            incompleteLinesCount.textContent = searchActive
-                ? visibleCount + ' / ' + count
-                : count + (count > 1 ? ' lignes' : ' ligne');
+            incompleteLinesCount.textContent = count + (count > 1 ? ' lignes' : ' ligne');
             incompleteLinesPanel.classList.toggle('complete', count === 0);
-            incompleteLinesPanel.classList.toggle('expanded', incompleteLinesExpanded || searchActive);
-            incompleteLinesToggle.setAttribute('aria-expanded', (incompleteLinesExpanded || searchActive) ? 'true' : 'false');
-            if (incompleteLinesSearchWrap) incompleteLinesSearchWrap.style.display = count === 0 ? 'none' : '';
-            if (clearIncompleteLinesSearchBtn) clearIncompleteLinesSearchBtn.classList.toggle('visible', searchActive);
+            incompleteLinesPanel.classList.toggle('expanded', incompleteLinesExpanded);
+            incompleteLinesToggle.setAttribute('aria-expanded', incompleteLinesExpanded ? 'true' : 'false');
 
             if (count === 0) {
                 incompleteLinesExpanded = false;
-                incompleteLinesSearchQuery = '';
-                if (incompleteLinesSearch) incompleteLinesSearch.value = '';
                 incompleteLinesPanel.classList.remove('expanded');
                 incompleteLinesToggle.setAttribute('aria-expanded', 'false');
                 incompleteLinesHint.textContent = 'Toutes les lignes sont complètes ou validées.';
@@ -9860,11 +9769,7 @@
                 return;
             }
 
-            if (searchActive) {
-                incompleteLinesHint.textContent = visibleCount
-                    ? visibleCount + (visibleCount > 1 ? ' lignes trouvées' : ' ligne trouvée') + ' sur ' + count + ' · recherche active'
-                    : 'Aucune ligne ne correspond à « ' + incompleteLinesSearch.value.trim() + ' »';
-            } else if (incompleteLinesExpanded) {
+            if (incompleteLinesExpanded) {
                 incompleteLinesHint.textContent = 'Toutes les lignes sont affichées · toucher ici pour replier';
             } else if (count > 4) {
                 incompleteLinesHint.textContent = '4 lignes affichées sur ' + count + ' · toucher ici pour tout afficher';
@@ -9873,39 +9778,11 @@
             }
 
             incompleteLinesList.innerHTML = '';
-            if (searchActive && visibleCount === 0) {
-                incompleteLinesList.innerHTML = '<div class="incomplete-lines-no-match">Aucune ligne incomplète ne correspond à cette recherche.</div>';
-                return;
-            }
-
-            const visible = searchActive
-                ? filtered
-                : (incompleteLinesExpanded ? incomplete : incomplete.slice(0, 4));
+            const visible = incompleteLinesExpanded ? incomplete : incomplete.slice(0, 4);
             visible.forEach(match => incompleteLinesList.appendChild(createIncompleteLineButton(match)));
         }
 
-        if (incompleteLinesSearch) {
-            incompleteLinesSearch.addEventListener('input', () => {
-                incompleteLinesSearchQuery = incompleteLinesSearch.value;
-                refreshIncompleteLines();
-            });
-            incompleteLinesSearch.addEventListener('search', () => {
-                incompleteLinesSearchQuery = incompleteLinesSearch.value;
-                refreshIncompleteLines();
-            });
-        }
-
-        if (clearIncompleteLinesSearchBtn) {
-            clearIncompleteLinesSearchBtn.addEventListener('click', () => {
-                if (incompleteLinesSearch) incompleteLinesSearch.value = '';
-                incompleteLinesSearchQuery = '';
-                refreshIncompleteLines();
-                incompleteLinesSearch?.focus({ preventScroll: true });
-            });
-        }
-
         incompleteLinesToggle.addEventListener('click', () => {
-            if (normalizeSearchText(incompleteLinesSearchQuery)) return;
             if (searchIndex.filter(match => isIncompleteLine(match.data) && !isIncompleteLineAccepted(match)).length <= 4 && !incompleteLinesExpanded) return;
             incompleteLinesExpanded = !incompleteLinesExpanded;
             refreshIncompleteLines();
