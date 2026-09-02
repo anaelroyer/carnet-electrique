@@ -176,6 +176,62 @@
             background: #166534;
             color: #dcfce7;
         }
+        .incomplete-lines-search-wrap {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 9px;
+            border-bottom: 1px solid rgba(180,83,9,.32);
+            background: rgba(15,23,42,.42);
+        }
+        .incomplete-lines-panel.complete .incomplete-lines-search-wrap {
+            display: none;
+        }
+        .incomplete-lines-search {
+            flex: 1 1 auto;
+            min-width: 0;
+            height: 36px;
+            padding: 7px 10px;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            background: #0f172a;
+            color: #f8fafc;
+            font: inherit;
+            font-size: .73rem;
+            font-weight: 650;
+            outline: none;
+        }
+        .incomplete-lines-search::placeholder { color: #94a3b8; }
+        .incomplete-lines-search:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 2px rgba(245,158,11,.16);
+        }
+        .incomplete-lines-search-clear {
+            display: none;
+            flex: 0 0 auto;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            background: #1e293b;
+            color: #e2e8f0;
+            font: inherit;
+            font-size: 1rem;
+            line-height: 1;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .incomplete-lines-search-clear.visible { display: inline-flex; }
+        .incomplete-lines-no-match {
+            padding: 10px 11px;
+            color: #cbd5e1;
+            font-size: .73rem;
+            font-weight: 700;
+            text-align: center;
+        }
         .incomplete-lines-list {
             display: flex;
             flex-direction: column;
@@ -299,6 +355,9 @@
             .incomplete-lines-title { font-size: .77rem; }
             .incomplete-lines-hint { font-size: .62rem; }
             .incomplete-lines-count { font-size: .65rem; }
+            .incomplete-lines-search-wrap { padding: 7px 8px; }
+            .incomplete-lines-search { height: 34px; font-size: .69rem; }
+            .incomplete-lines-search-clear { width: 32px; height: 32px; }
             .incomplete-line-item { min-height: 46px; }
             .incomplete-line-edit { padding: 7px 8px; }
             .incomplete-line-actions { padding: 5px 6px 5px 0; }
@@ -1831,6 +1890,10 @@
             </span>
             <span id="incompleteLinesCount" class="incomplete-lines-count">0</span>
         </button>
+        <div id="incompleteLinesSearchWrap" class="incomplete-lines-search-wrap">
+            <input type="search" id="incompleteLinesSearch" class="incomplete-lines-search" placeholder="Rechercher un tableau, une ligne…" autocomplete="off" inputmode="search" enterkeyhint="search" aria-label="Rechercher dans les lignes incomplètes">
+            <button type="button" id="clearIncompleteLinesSearchBtn" class="incomplete-lines-search-clear" aria-label="Effacer la recherche" title="Effacer la recherche">×</button>
+        </div>
         <div id="incompleteLinesList" class="incomplete-lines-list"></div>
     </section>
 
@@ -9535,8 +9598,12 @@
         const incompleteLinesToggle = document.getElementById('incompleteLinesToggle');
         const incompleteLinesCount = document.getElementById('incompleteLinesCount');
         const incompleteLinesHint = document.getElementById('incompleteLinesHint');
+        const incompleteLinesSearchWrap = document.getElementById('incompleteLinesSearchWrap');
+        const incompleteLinesSearch = document.getElementById('incompleteLinesSearch');
+        const clearIncompleteLinesSearchBtn = document.getElementById('clearIncompleteLinesSearchBtn');
         const incompleteLinesList = document.getElementById('incompleteLinesList');
         let incompleteLinesExpanded = false;
+        let incompleteLinesSearchQuery = '';
         let searchIndex = [];
         let currentSearchMatches = [];
         let searchPrintOpenStates = [];
@@ -9751,17 +9818,41 @@
             return item;
         }
 
+        function incompleteLineSearchText(match) {
+            return normalizeSearchText([
+                match?.context?.domain,
+                match?.context?.table,
+                match?.data?.depart,
+                match?.data?.tension,
+                match?.data?.designation,
+                match?.data?.gisement
+            ].filter(Boolean).join(' '));
+        }
+
         function refreshIncompleteLines() {
             if (!incompleteLinesPanel || !incompleteLinesList) return;
             const incomplete = searchIndex.filter(match => isIncompleteLine(match.data) && !isIncompleteLineAccepted(match));
             const count = incomplete.length;
-            incompleteLinesCount.textContent = count + (count > 1 ? ' lignes' : ' ligne');
+            const query = normalizeSearchText(incompleteLinesSearchQuery);
+            const filtered = query
+                ? incomplete.filter(match => incompleteLineSearchText(match).includes(query))
+                : incomplete;
+            const visibleCount = filtered.length;
+            const searchActive = !!query;
+
+            incompleteLinesCount.textContent = searchActive
+                ? visibleCount + ' / ' + count
+                : count + (count > 1 ? ' lignes' : ' ligne');
             incompleteLinesPanel.classList.toggle('complete', count === 0);
-            incompleteLinesPanel.classList.toggle('expanded', incompleteLinesExpanded);
-            incompleteLinesToggle.setAttribute('aria-expanded', incompleteLinesExpanded ? 'true' : 'false');
+            incompleteLinesPanel.classList.toggle('expanded', incompleteLinesExpanded || searchActive);
+            incompleteLinesToggle.setAttribute('aria-expanded', (incompleteLinesExpanded || searchActive) ? 'true' : 'false');
+            if (incompleteLinesSearchWrap) incompleteLinesSearchWrap.style.display = count === 0 ? 'none' : '';
+            if (clearIncompleteLinesSearchBtn) clearIncompleteLinesSearchBtn.classList.toggle('visible', searchActive);
 
             if (count === 0) {
                 incompleteLinesExpanded = false;
+                incompleteLinesSearchQuery = '';
+                if (incompleteLinesSearch) incompleteLinesSearch.value = '';
                 incompleteLinesPanel.classList.remove('expanded');
                 incompleteLinesToggle.setAttribute('aria-expanded', 'false');
                 incompleteLinesHint.textContent = 'Toutes les lignes sont complètes ou validées.';
@@ -9769,7 +9860,11 @@
                 return;
             }
 
-            if (incompleteLinesExpanded) {
+            if (searchActive) {
+                incompleteLinesHint.textContent = visibleCount
+                    ? visibleCount + (visibleCount > 1 ? ' lignes trouvées' : ' ligne trouvée') + ' sur ' + count + ' · recherche active'
+                    : 'Aucune ligne ne correspond à « ' + incompleteLinesSearch.value.trim() + ' »';
+            } else if (incompleteLinesExpanded) {
                 incompleteLinesHint.textContent = 'Toutes les lignes sont affichées · toucher ici pour replier';
             } else if (count > 4) {
                 incompleteLinesHint.textContent = '4 lignes affichées sur ' + count + ' · toucher ici pour tout afficher';
@@ -9778,11 +9873,39 @@
             }
 
             incompleteLinesList.innerHTML = '';
-            const visible = incompleteLinesExpanded ? incomplete : incomplete.slice(0, 4);
+            if (searchActive && visibleCount === 0) {
+                incompleteLinesList.innerHTML = '<div class="incomplete-lines-no-match">Aucune ligne incomplète ne correspond à cette recherche.</div>';
+                return;
+            }
+
+            const visible = searchActive
+                ? filtered
+                : (incompleteLinesExpanded ? incomplete : incomplete.slice(0, 4));
             visible.forEach(match => incompleteLinesList.appendChild(createIncompleteLineButton(match)));
         }
 
+        if (incompleteLinesSearch) {
+            incompleteLinesSearch.addEventListener('input', () => {
+                incompleteLinesSearchQuery = incompleteLinesSearch.value;
+                refreshIncompleteLines();
+            });
+            incompleteLinesSearch.addEventListener('search', () => {
+                incompleteLinesSearchQuery = incompleteLinesSearch.value;
+                refreshIncompleteLines();
+            });
+        }
+
+        if (clearIncompleteLinesSearchBtn) {
+            clearIncompleteLinesSearchBtn.addEventListener('click', () => {
+                if (incompleteLinesSearch) incompleteLinesSearch.value = '';
+                incompleteLinesSearchQuery = '';
+                refreshIncompleteLines();
+                incompleteLinesSearch?.focus({ preventScroll: true });
+            });
+        }
+
         incompleteLinesToggle.addEventListener('click', () => {
+            if (normalizeSearchText(incompleteLinesSearchQuery)) return;
             if (searchIndex.filter(match => isIncompleteLine(match.data) && !isIncompleteLineAccepted(match)).length <= 4 && !incompleteLinesExpanded) return;
             incompleteLinesExpanded = !incompleteLinesExpanded;
             refreshIncompleteLines();
