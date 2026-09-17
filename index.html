@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Carnet Électrique</title>
-    <!-- Version 100 : correction des faux départs + lignes ajoutées modifiables/supprimables dans les nouveaux onglets -->
+    <!-- Version 101 : tableaux principaux ajoutés modifiables/supprimables + départs modifiables -->
     <meta name="theme-color" content="#121212">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2604,7 +2604,37 @@
             }
         }
 
-    </style>
+    
+
+        /* Version 101 : édition/suppression des tableaux principaux ajoutés */
+        .added-main-table > details > summary {
+            gap: 7px;
+        }
+        .added-main-table-edit-btn {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            border: 1px solid rgba(255,255,255,.28);
+            border-radius: 7px;
+            background: rgba(15,23,42,.72);
+            color: #dbeafe;
+            font: inherit;
+            font-size: 15px;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .added-main-table-edit-btn:hover,
+        .added-main-table-edit-btn:focus-visible {
+            background: #334155;
+            border-color: #93c5fd;
+            outline: none;
+        }
+        .added-main-table-edit-btn:active { transform: scale(.96); }
+</style>
 
     <style>
         /* Ajout manuel d'un départ */
@@ -9133,6 +9163,46 @@
 
 
     <!-- Modale d'ajout d'un départ -->
+    <div id="editAddedMainTableModalBackdrop" class="edit-modal-backdrop" aria-hidden="true">
+        <div class="edit-modal" role="dialog" aria-modal="true" aria-labelledby="editAddedMainTableModalTitle">
+            <div class="edit-modal-header">
+                <div id="editAddedMainTableModalTitle" class="edit-modal-title">Modifier le tableau</div>
+                <button type="button" id="editAddedMainTableModalClose" class="edit-modal-close" aria-label="Fermer">×</button>
+            </div>
+            <div class="edit-modal-body">
+                <div id="editAddedMainTablePasswordStep">
+                    <p class="edit-note">Saisissez le mot de passe d’édition pour modifier ou supprimer ce tableau.</p>
+                    <div id="editAddedMainTableCurrentName" class="add-modal-table-name"></div>
+                    <div class="edit-field">
+                        <label for="editAddedMainTablePassword">Mot de passe</label>
+                        <input id="editAddedMainTablePassword" type="password" autocomplete="off">
+                    </div>
+                    <div id="editAddedMainTablePasswordError" class="edit-error"></div>
+                    <div class="edit-modal-actions">
+                        <button type="button" class="edit-cancel-btn" data-edit-added-table-cancel>Annuler</button>
+                        <button type="button" id="editAddedMainTableUnlockBtn" class="edit-unlock-btn">Déverrouiller</button>
+                    </div>
+                </div>
+                <form id="editAddedMainTableForm" style="display:none;">
+                    <div class="edit-field">
+                        <label for="editAddedMainTableName">Nom du tableau</label>
+                        <input id="editAddedMainTableName" type="text" autocomplete="off">
+                    </div>
+                    <div class="edit-field" id="editAddedMainTableGisementField">
+                        <label for="editAddedMainTableGisement">Gisement du tableau</label>
+                        <input id="editAddedMainTableGisement" type="text" autocomplete="off">
+                    </div>
+                    <div id="editAddedMainTableError" class="edit-error"></div>
+                    <div class="edit-modal-actions">
+                        <button type="button" id="deleteAddedMainTableBtn" class="edit-delete-btn">Supprimer le tableau</button>
+                        <button type="button" class="edit-cancel-btn" data-edit-added-table-cancel>Annuler</button>
+                        <button type="submit" class="edit-save-btn">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div id="addDepartureModalBackdrop" class="edit-modal-backdrop" aria-hidden="true">
         <div class="edit-modal" role="dialog" aria-modal="true" aria-labelledby="addDepartureModalTitle">
             <div class="edit-modal-header">
@@ -10941,6 +11011,129 @@
             catch (e) { console.warn('Impossible d’enregistrer les tableaux ajoutés localement.', e); }
         }
 
+
+        let addedMainTableBeingEditedId = '';
+
+        function addedMainTableRecordById(tableId) {
+            return loadAddedMainTablesStorage()[tableId] || null;
+        }
+
+        function removeAddedMainTableLocal(tableId, options = {}) {
+            const tables = loadAddedMainTablesStorage();
+            const record = tables[tableId];
+            if (!record) return null;
+            const tableKey = 'main:' + (record.detailsId || (tableId + '-details'));
+
+            const additions = loadAddedRowsStorage();
+            const removedRowIds = [];
+            Object.keys(additions).forEach(rowId => {
+                if (additions[rowId]?.tableId === tableKey) {
+                    removedRowIds.push(rowId);
+                    delete additions[rowId];
+                }
+            });
+            saveAddedRowsStorage(additions);
+
+            const edits = loadStoredEdits();
+            const deletions = loadStoredDeletions();
+            const validated = loadValidatedIncomplete();
+            removedRowIds.forEach(rowId => {
+                delete edits[rowId];
+                deletions[rowId] = true;
+                delete validated[rowId];
+                rowsWithStableId(rowId).forEach(row => removeRowAndCompanion(row));
+            });
+            saveStoredEdits(edits);
+            saveStoredDeletions(deletions);
+            saveValidatedIncomplete(validated);
+
+            delete tables[tableId];
+            saveAddedMainTablesStorage(tables);
+
+            const panelItem = document.querySelector(`.panel-item[data-added-table-id="${CSS.escape(tableId)}"]`);
+            const pane = panelItem?.closest('.electrical-tab-pane');
+            panelItem?.remove();
+            if (pane?.dataset?.tabId) updateElectricalTabEmptyState(pane.dataset.tabId);
+
+            if (options.syncRows !== false) {
+                removedRowIds.forEach(rowId => {
+                    if (typeof saveCloudModification === 'function') {
+                        saveCloudModification(rowId, null, true, { incompleteAccepted: false });
+                    }
+                });
+            }
+            if (typeof rebuildSearchIndex === 'function') rebuildSearchIndex();
+            return { record, removedRowIds };
+        }
+
+        function updateAddedMainTableLocal(tableId, name, gisement) {
+            const tables = loadAddedMainTablesStorage();
+            const record = tables[tableId];
+            if (!record) return null;
+            record.name = String(name || '').trim();
+            record.gisement = String(gisement || '').trim();
+            tables[tableId] = record;
+            saveAddedMainTablesStorage(tables);
+
+            const panelItem = document.querySelector(`.panel-item[data-added-table-id="${CSS.escape(tableId)}"]`);
+            if (panelItem) {
+                panelItem.dataset.name = hierarchyNorm(record.name || '').toLowerCase();
+                const summary = panelItem.querySelector(':scope > details > summary');
+                const label = summary?.querySelector('.panel-name');
+                const badge = summary?.querySelector('.badge-gisement');
+                const editBtn = summary?.querySelector('.added-main-table-edit-btn');
+                if (label) label.textContent = record.name;
+                if (badge) badge.textContent = record.gisement || '—';
+                if (editBtn) {
+                    editBtn.title = 'Modifier ou supprimer ce tableau';
+                    editBtn.setAttribute('aria-label', 'Modifier ou supprimer le tableau ' + record.name);
+                }
+            }
+            return record;
+        }
+
+        function openEditAddedMainTableModal(tableId) {
+            const record = addedMainTableRecordById(tableId);
+            if (!record) return;
+            addedMainTableBeingEditedId = tableId;
+            editAddedMainTablePassword.value = '';
+            editAddedMainTablePasswordError.textContent = '';
+            editAddedMainTableError.textContent = '';
+            editAddedMainTableCurrentName.textContent = 'Tableau : ' + record.name;
+            editAddedMainTablePasswordStep.style.display = '';
+            editAddedMainTableForm.style.display = 'none';
+            editAddedMainTableName.value = record.name || '';
+            editAddedMainTableGisement.value = record.gisement || '';
+            const special = tabIdUsesCarteVoieSchema(record.tabId || '');
+            editAddedMainTableGisementField.style.display = special ? 'none' : '';
+            editAddedMainTableModalBackdrop.classList.add('open');
+            editAddedMainTableModalBackdrop.setAttribute('aria-hidden', 'false');
+            setTimeout(() => editAddedMainTablePassword.focus(), 0);
+        }
+
+        function closeEditAddedMainTableModal() {
+            editAddedMainTableModalBackdrop.classList.remove('open');
+            editAddedMainTableModalBackdrop.setAttribute('aria-hidden', 'true');
+            editAddedMainTablePassword.value = '';
+            editAddedMainTablePasswordError.textContent = '';
+            editAddedMainTableError.textContent = '';
+            editAddedMainTablePasswordStep.style.display = '';
+            editAddedMainTableForm.style.display = 'none';
+            addedMainTableBeingEditedId = '';
+        }
+
+        function unlockEditAddedMainTableModal() {
+            if (editAddedMainTablePassword.value !== EDIT_PASSWORD) {
+                editAddedMainTablePasswordError.textContent = 'Mot de passe incorrect.';
+                editAddedMainTablePassword.select();
+                return;
+            }
+            editAddedMainTablePasswordError.textContent = '';
+            editAddedMainTablePasswordStep.style.display = 'none';
+            editAddedMainTableForm.style.display = '';
+            setTimeout(() => editAddedMainTableName.focus(), 0);
+        }
+
         function addedMainTableRandomId() {
             const randomPart = (window.crypto?.getRandomValues)
                 ? Array.from(window.crypto.getRandomValues(new Uint32Array(2))).map(v => v.toString(36)).join('')
@@ -10990,10 +11183,21 @@
             const name = document.createElement('span');
             name.className = 'panel-name';
             name.textContent = record.name || 'Nouveau tableau';
+            const editTableButton = document.createElement('button');
+            editTableButton.type = 'button';
+            editTableButton.className = 'added-main-table-edit-btn';
+            editTableButton.textContent = '✎';
+            editTableButton.title = 'Modifier ou supprimer ce tableau';
+            editTableButton.setAttribute('aria-label', 'Modifier ou supprimer le tableau ' + (record.name || ''));
+            editTableButton.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopPropagation();
+                openEditAddedMainTableModal(record.id);
+            });
             const badge = document.createElement('span');
             badge.className = 'badge-gisement';
             badge.textContent = record.gisement || '—';
-            summary.append(name, badge);
+            summary.append(name, editTableButton, badge);
 
             const panelContent = document.createElement('div');
             panelContent.className = 'panel-content';
@@ -11920,6 +12124,19 @@
         const addMainTableGisement = document.getElementById('addMainTableGisement');
 
         let tableReceivingNewDeparture = null;
+        const editAddedMainTableModalBackdrop = document.getElementById('editAddedMainTableModalBackdrop');
+        const editAddedMainTableModalClose = document.getElementById('editAddedMainTableModalClose');
+        const editAddedMainTablePasswordStep = document.getElementById('editAddedMainTablePasswordStep');
+        const editAddedMainTablePassword = document.getElementById('editAddedMainTablePassword');
+        const editAddedMainTablePasswordError = document.getElementById('editAddedMainTablePasswordError');
+        const editAddedMainTableCurrentName = document.getElementById('editAddedMainTableCurrentName');
+        const editAddedMainTableUnlockBtn = document.getElementById('editAddedMainTableUnlockBtn');
+        const editAddedMainTableForm = document.getElementById('editAddedMainTableForm');
+        const editAddedMainTableName = document.getElementById('editAddedMainTableName');
+        const editAddedMainTableGisement = document.getElementById('editAddedMainTableGisement');
+        const editAddedMainTableGisementField = document.getElementById('editAddedMainTableGisementField');
+        const editAddedMainTableError = document.getElementById('editAddedMainTableError');
+        const deleteAddedMainTableBtn = document.getElementById('deleteAddedMainTableBtn');
         const addDepartureModalBackdrop = document.getElementById('addDepartureModalBackdrop');
         const addDepartureModalClose = document.getElementById('addDepartureModalClose');
         const addDepartureModalTitle = document.getElementById('addDepartureModalTitle');
@@ -12101,6 +12318,12 @@
                     saveStoredDeletions(deletions);
                 }
                 ensureAddedRowsRendered(additions[rowId], true);
+            }
+
+            if (data && data.addedTable === true && data.deleted === true) {
+                removeAddedMainTableLocal(rowId, { syncRows: false });
+                scheduleCloudUiRefresh();
+                return;
             }
 
             if (data && data.deleted === true) {
@@ -12917,6 +13140,72 @@
             if (event.key === 'Escape' && editModalBackdrop.classList.contains('open')) closeEditModal();
         });
 
+
+        editAddedMainTableUnlockBtn.addEventListener('click', unlockEditAddedMainTableModal);
+        editAddedMainTablePassword.addEventListener('keydown', event => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                unlockEditAddedMainTableModal();
+            }
+        });
+        editAddedMainTableForm.addEventListener('submit', event => {
+            event.preventDefault();
+            const tableId = addedMainTableBeingEditedId;
+            const current = addedMainTableRecordById(tableId);
+            if (!current) return;
+            const name = editAddedMainTableName.value.trim();
+            const gisement = editAddedMainTableGisement.value.trim();
+            editAddedMainTableError.textContent = '';
+            if (!name) {
+                editAddedMainTableError.textContent = 'Renseignez le nom du tableau.';
+                editAddedMainTableName.focus();
+                return;
+            }
+            if (mainTableNameExists(name, tableId)) {
+                editAddedMainTableError.textContent = 'Un tableau portant ce nom existe déjà.';
+                editAddedMainTableName.focus();
+                return;
+            }
+            const updated = updateAddedMainTableLocal(tableId, name, gisement);
+            if (updated && typeof saveCloudModification === 'function') {
+                saveCloudModification(updated.id, null, false, {
+                    addedTable: true,
+                    tabId: updated.tabId || 'force',
+                    domainName: updated.domainName,
+                    name: updated.name,
+                    gisement: updated.gisement || '',
+                    detailsId: updated.detailsId || (updated.id + '-details')
+                });
+            }
+            closeEditAddedMainTableModal();
+            if (typeof rebuildSearchIndex === 'function') rebuildSearchIndex();
+        });
+        deleteAddedMainTableBtn.addEventListener('click', () => {
+            const tableId = addedMainTableBeingEditedId;
+            const record = addedMainTableRecordById(tableId);
+            if (!record) return;
+            if (!window.confirm(`Supprimer le tableau « ${record.name} » et tous ses départs ajoutés ?`)) return;
+            const removed = removeAddedMainTableLocal(tableId, { syncRows: true });
+            if (removed && typeof saveCloudModification === 'function') {
+                saveCloudModification(tableId, null, true, {
+                    addedTable: true,
+                    tabId: record.tabId || 'force',
+                    domainName: record.domainName,
+                    name: record.name,
+                    gisement: record.gisement || '',
+                    detailsId: record.detailsId || (record.id + '-details')
+                });
+            }
+            closeEditAddedMainTableModal();
+        });
+        editAddedMainTableModalClose.addEventListener('click', closeEditAddedMainTableModal);
+        document.querySelectorAll('[data-edit-added-table-cancel]').forEach(button => button.addEventListener('click', closeEditAddedMainTableModal));
+        editAddedMainTableModalBackdrop.addEventListener('click', event => {
+            if (event.target === editAddedMainTableModalBackdrop) closeEditAddedMainTableModal();
+        });
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && editAddedMainTableModalBackdrop.classList.contains('open')) closeEditAddedMainTableModal();
+        });
 
         addMainTableUnlockBtn.addEventListener('click', unlockAddMainTableModal);
         addMainTablePassword.addEventListener('keydown', event => {
