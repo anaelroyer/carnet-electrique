@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Carnet Électrique</title>
-    <!-- Version 95 : onglets Force/AER/ACR personnalisables + tableaux/départs synchronisés -->
+    <!-- Version 100 : correction des faux départs + lignes ajoutées modifiables/supprimables dans les nouveaux onglets -->
     <meta name="theme-color" content="#121212">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2536,6 +2536,71 @@
                 flex-basis: 30px !important;
                 width: 30px !important;
                 min-width: 30px;
+            }
+        }
+
+    
+
+        /* ================================================================
+           Version 98 : tableaux SPI / CCSN / CCCN
+           Affichage : Carte | Voie | Désignation | ⛓
+           Une 4e cellule technique reste dans le DOM, masquée, afin de
+           conserver la compatibilité avec le stockage existant.
+           ================================================================ */
+        .panel-item table.cvd-schema > thead > tr > th:nth-child(1),
+        .panel-item table.cvd-schema > tbody > tr > td:nth-child(1) {
+            width: 25% !important;
+        }
+
+        .panel-item table.cvd-schema > thead > tr > th:nth-child(2),
+        .panel-item table.cvd-schema > tbody > tr > td:nth-child(2) {
+            width: 18% !important;
+            text-align: center;
+        }
+
+        .panel-item table.cvd-schema > thead > tr > th:nth-child(3),
+        .panel-item table.cvd-schema > tbody > tr > td:nth-child(3) {
+            width: 47% !important;
+        }
+
+        /* Annule le remplacement global de la 2e colonne par "U". */
+        .panel-item table.cvd-schema > thead > tr > th:nth-child(2) {
+            font-size: .74rem !important;
+        }
+        .panel-item table.cvd-schema > thead > tr > th:nth-child(2)::after {
+            content: none !important;
+            display: none !important;
+        }
+
+        /* La 4e colonne est seulement une colonne technique interne. */
+        .panel-item table.cvd-schema > thead > tr > th:nth-child(4),
+        .panel-item table.cvd-schema > tbody > tr > td:nth-child(4):not(.hierarchy-action-cell) {
+            display: none !important;
+        }
+        .panel-item table.cvd-schema > thead > tr > th:nth-child(4)::after {
+            content: none !important;
+            display: none !important;
+        }
+
+        .panel-item table.cvd-schema > thead > tr > th.hierarchy-action-header,
+        .panel-item table.cvd-schema > tbody > tr > td.hierarchy-action-cell {
+            width: 10% !important;
+            min-width: 32px !important;
+            max-width: 42px !important;
+        }
+
+        @media (max-width: 600px) {
+            .panel-item table.cvd-schema > thead > tr > th:nth-child(1),
+            .panel-item table.cvd-schema > tbody > tr > td:nth-child(1) { width: 26% !important; }
+
+            .panel-item table.cvd-schema > thead > tr > th:nth-child(2),
+            .panel-item table.cvd-schema > tbody > tr > td:nth-child(2) { width: 18% !important; }
+
+            .panel-item table.cvd-schema > thead > tr > th:nth-child(3),
+            .panel-item table.cvd-schema > tbody > tr > td:nth-child(3) { width: 46% !important; }
+
+            .panel-item table.cvd-schema > thead > tr > th:nth-child(2) {
+                font-size: .64rem !important;
             }
         }
 
@@ -10322,6 +10387,72 @@
             return document.querySelector(`.electrical-tab-pane[data-tab-id="${CSS.escape(tabId || '')}"]`);
         }
 
+
+        const CARTE_VOIE_TAB_NAMES = new Set(['SPI', 'CCSN', 'CCCN']);
+
+        function normalizeCarteVoieTabName(value) {
+            return String(value || '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .toUpperCase();
+        }
+
+        function tabNameUsesCarteVoieSchema(name) {
+            return CARTE_VOIE_TAB_NAMES.has(normalizeCarteVoieTabName(name));
+        }
+
+        function tabIdUsesCarteVoieSchema(tabId) {
+            if (!tabId) return false;
+            const pane = electricalPaneForTab(tabId);
+            const name = pane?.dataset?.tabName || electricalTabRecord(tabId)?.name || '';
+            return tabNameUsesCarteVoieSchema(name);
+        }
+
+        function tableTabId(table) {
+            return table?.closest?.('.electrical-tab-pane')?.dataset?.tabId || '';
+        }
+
+        function tableUsesCarteVoieSchema(table) {
+            if (!table) return false;
+            if (table.dataset.rowSchema === 'carte-voie-designation') return true;
+            return tabIdUsesCarteVoieSchema(tableTabId(table));
+        }
+
+        function applyCarteVoieSchemaToTable(table, explicitTabId = '') {
+            if (!table) return;
+            const tabId = explicitTabId || tableTabId(table);
+            const special = tabIdUsesCarteVoieSchema(tabId);
+            const headers = Array.from(table.querySelectorAll(':scope > thead > tr > th'))
+                .filter(th => !th.classList.contains('hierarchy-action-header'));
+            if (headers.length < 4) return;
+
+            if (special) {
+                table.classList.add('cvd-schema');
+                table.dataset.rowSchema = 'carte-voie-designation';
+                headers[0].textContent = 'Carte';
+                headers[1].textContent = 'Voie';
+                headers[2].textContent = 'Désignation';
+                headers[3].textContent = '';
+                headers[3].setAttribute('aria-hidden', 'true');
+            } else if (table.dataset.rowSchema === 'carte-voie-designation') {
+                table.classList.remove('cvd-schema');
+                delete table.dataset.rowSchema;
+                headers[0].textContent = 'Départ';
+                headers[1].textContent = 'Tension';
+                headers[2].textContent = 'Désignation';
+                headers[3].textContent = 'Gisement';
+                headers[3].removeAttribute('aria-hidden');
+            }
+        }
+
+        function refreshCarteVoieSchemas(tabId = '') {
+            const root = tabId ? electricalPaneForTab(tabId) : document;
+            if (!root) return;
+            root.querySelectorAll('.panel-item table').forEach(table => applyCarteVoieSchemaToTable(table, tabId || tableTabId(table)));
+        }
+
         function updateElectricalTabEmptyState(tabId) {
             if (tabId === 'force') return;
             const pane = electricalPaneForTab(tabId);
@@ -10456,6 +10587,8 @@
                 const label = button.querySelector('.electrical-tab-label');
                 if (label) label.textContent = record.name;
             }
+
+            if (pane) refreshCarteVoieSchemas(record.id);
 
             if (runtime && record.id !== 'force') {
                 if (typeof initAddMainTableButtons === 'function') initAddMainTableButtons();
@@ -10868,6 +11001,7 @@
             responsive.className = 'table-responsive';
             const table = document.createElement('table');
             table.innerHTML = '<thead><tr><th>Départ</th><th>Tension</th><th>Désignation</th><th>Gisement</th></tr></thead><tbody></tbody>';;
+            applyCarteVoieSchemaToTable(table, record.tabId || '');
             responsive.appendChild(table);
             panelContent.appendChild(responsive);
             details.append(summary, panelContent);
@@ -10906,6 +11040,8 @@
             const panelItem = createAddedMainTableElement(record);
             domainContent.appendChild(panelItem);
             const pane = domain.closest('.electrical-tab-pane');
+            const createdTable = panelItem.querySelector('table');
+            if (createdTable) applyCarteVoieSchemaToTable(createdTable, record.tabId || pane?.dataset?.tabId || '');
             if (pane?.dataset?.tabId) panelItem.dataset.tabId = pane.dataset.tabId;
             if (pane?.dataset?.tabId) updateElectricalTabEmptyState(pane.dataset.tabId);
 
@@ -11085,6 +11221,7 @@
             if (runtime && created.length) {
                 hierarchyRegisterAddedRows(created);
                 if (typeof initRowEditing === 'function') initRowEditing();
+                ensureAddedRowsEditable();
                 if (typeof rebuildSearchIndex === 'function') rebuildSearchIndex();
                 if (typeof initAddDepartureButtons === 'function') initAddDepartureButtons();
             }
@@ -11113,6 +11250,7 @@
         initElectricalTabs();
         restoreAddedMainTablesBeforeHierarchy();
         restoreAddedRowsBeforeHierarchy();
+        refreshCarteVoieSchemas();
 
         initElectricalHierarchy();
         initAddMainTableButtons();
@@ -11164,7 +11302,8 @@
                 depart: searchCellValue(cells[0]),
                 tension: searchCellValue(cells[1]),
                 designation: searchCellValue(cells[2]),
-                gisement: searchCellValue(cells[3])
+                gisement: searchCellValue(cells[3]),
+                schema: tableUsesCarteVoieSchema(row.closest('table')) ? 'carte-voie-designation' : 'standard'
             };
         }
 
@@ -11180,20 +11319,33 @@
             };
         }
 
+        function isSearchHeaderLikeData(data) {
+            if (!data) return false;
+            const first = normalizeSearchText(data.depart);
+            const second = normalizeSearchText(data.tension);
+            const third = normalizeSearchText(data.designation);
+            const fourth = normalizeSearchText(data.gisement);
+
+            // Sécurité pour les anciens tableaux dont une ligne d'en-tête aurait été
+            // placée dans <tbody>, ainsi que pour les libellés compacts utilisés à l'écran.
+            const firstIsHeader = first === 'depart' || first === 'carte';
+            const secondIsHeader = ['tension', 'tens.', 'tens', 'u', 'voie'].includes(second);
+            const thirdIsHeader = third === 'designation';
+            const fourthIsHeader = ['', 'gisement', 'gis.', 'gis'].includes(fourth);
+            return firstIsHeader && secondIsHeader && thirdIsHeader && fourthIsHeader;
+        }
+
         function rebuildSearchIndex() {
             const items = [];
             const seen = new Set();
-            document.querySelectorAll('.panel-item tbody tr').forEach(row => {
+            // Le combinator > est important : un <thead> de sous-tableau peut être un
+            // descendant d'un <tbody> parent, mais ce n'est jamais une ligne de données.
+            document.querySelectorAll('.panel-item tbody > tr').forEach(row => {
                 if (row.id?.startsWith('sub-') || row.classList.contains('section-label-row')) return;
+                // Une vraie ligne de données ne contient pas de TH.
+                if (row.querySelector(':scope > th')) return;
                 const data = searchRowData(row);
-                if (!data) return;
-                // Certains tableaux historiques contiennent leur ligne d'en-tête dans <tbody>.
-                // Elle ne doit jamais être indexée comme une installation incomplète.
-                const headerLike = normalizeSearchText(data.depart) === 'depart'
-                    && normalizeSearchText(data.tension) === 'tension'
-                    && normalizeSearchText(data.designation) === 'designation'
-                    && normalizeSearchText(data.gisement) === 'gisement';
-                if (headerLike) return;
+                if (!data || isSearchHeaderLikeData(data)) return;
                 const context = searchRowContext(row);
                 const dedupeKey = [context.domain, context.table, data.depart, data.tension, data.designation, data.gisement]
                     .map(normalizeSearchText).join('|');
@@ -11229,12 +11381,19 @@
 
         function incompleteLineIssues(data) {
             const issues = [];
-            const fields = [
-                ['Départ', data?.depart],
-                ['Tension', data?.tension],
-                ['Désignation', data?.designation],
-                ['Gisement', data?.gisement]
-            ];
+            const carteVoie = data?.schema === 'carte-voie-designation';
+            const fields = carteVoie
+                ? [
+                    ['Carte', data?.depart],
+                    ['Voie', data?.tension],
+                    ['Désignation', data?.designation]
+                ]
+                : [
+                    ['Départ', data?.depart],
+                    ['Tension', data?.tension],
+                    ['Désignation', data?.designation],
+                    ['Gisement', data?.gisement]
+                ];
 
             fields.forEach(([label, rawValue]) => {
                 const value = String(rawValue || '').trim();
@@ -11245,9 +11404,11 @@
                 }
             });
 
-            const gisement = String(data?.gisement || '').trim();
-            if (gisement && !gisement.includes('?') && !isCompleteGisement(gisement)) {
-                issues.push('Gisement invalide');
+            if (!carteVoie) {
+                const gisement = String(data?.gisement || '').trim();
+                if (gisement && !gisement.includes('?') && !isCompleteGisement(gisement)) {
+                    issues.push('Gisement invalide');
+                }
             }
             return issues;
         }
@@ -11284,18 +11445,21 @@
             const meta = document.createElement('div');
             meta.className = 'incomplete-line-meta';
 
+            const carteVoie = match.data.schema === 'carte-voie-designation';
             const depart = document.createElement('span');
-            depart.textContent = 'Départ : ' + (match.data.depart || 'vide');
+            depart.textContent = (carteVoie ? 'Carte : ' : 'Départ : ') + (match.data.depart || 'vide');
             meta.appendChild(depart);
 
             const tension = document.createElement('span');
-            tension.textContent = 'Tension : ' + (match.data.tension || 'vide');
+            tension.textContent = (carteVoie ? 'Voie : ' : 'Tension : ') + (match.data.tension || 'vide');
             meta.appendChild(tension);
 
-            const gisement = document.createElement('span');
-            gisement.className = 'incomplete-gisement-value';
-            gisement.textContent = 'Gisement : ' + (match.data.gisement || 'vide');
-            meta.appendChild(gisement);
+            if (!carteVoie) {
+                const gisement = document.createElement('span');
+                gisement.className = 'incomplete-gisement-value';
+                gisement.textContent = 'Gisement : ' + (match.data.gisement || 'vide');
+                meta.appendChild(gisement);
+            }
 
             button.appendChild(meta);
 
@@ -12289,6 +12453,38 @@
             return headers.map((th, index) => th.textContent.trim() || `Champ ${index + 1}`);
         }
 
+
+        function ensureRowEditButton(row) {
+            if (!row) return;
+            const cells = Array.from(row.children).filter(cell => cell.tagName === 'TD' && !cell.classList.contains('hierarchy-action-cell'));
+            if (!cells.length) return;
+            cells.forEach(td => ensureEditableCellContent(td));
+            captureOriginalRowValues(row);
+            const editCell = cells[0];
+            editCell.classList.add('edit-action-cell');
+            if (!editCell.querySelector(':scope > .edit-row-btn')) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'edit-row-btn';
+                button.textContent = '✎';
+                button.title = 'Modifier cette ligne';
+                button.setAttribute('aria-label', 'Modifier cette ligne');
+                button.addEventListener('click', event => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    openEditModal(row);
+                });
+                editCell.insertBefore(button, editCell.firstChild);
+            }
+        }
+
+        function ensureAddedRowsEditable() {
+            document.querySelectorAll('tr[data-added-row="true"]').forEach(row => {
+                if (!row.isConnected) return;
+                ensureRowEditButton(row);
+            });
+        }
+
         function initRowEditing() {
             const rows = editableRows();
             assignStableRowIds(rows);
@@ -12315,26 +12511,11 @@
                     setRowValues(row, stored[row.dataset.editRowId]);
                 }
 
-                // Le crayon reste à gauche de la ligne, dans la cellule Départ.
-                // La cinquième colonne à droite reste exclusivement réservée à la hiérarchie.
-                const editCell = cells[0];
-                editCell.classList.add('edit-action-cell');
-
-                if (!editCell.querySelector(':scope > .edit-row-btn')) {
-                    const button = document.createElement('button');
-                    button.type = 'button';
-                    button.className = 'edit-row-btn';
-                    button.textContent = '✎';
-                    button.title = 'Modifier cette ligne';
-                    button.setAttribute('aria-label', 'Modifier cette ligne');
-                    button.addEventListener('click', event => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        openEditModal(row);
-                    });
-                    editCell.insertBefore(button, editCell.firstChild);
-                }
+                // Le crayon reste à gauche de la ligne, dans la première cellule utile.
+                // La dernière colonne à droite reste exclusivement réservée à la hiérarchie.
+                ensureRowEditButton(row);
             });
+            ensureAddedRowsEditable();
         }
 
 
@@ -12410,6 +12591,23 @@
             return 'added-' + randomPart;
         }
 
+        function configureAddDepartureModalForTable(table) {
+            const carteVoie = tableUsesCarteVoieSchema(table);
+            addDepartureForm.dataset.rowSchema = carteVoie ? 'carte-voie-designation' : 'standard';
+
+            const departField = addDepartureDepart.closest('.edit-field');
+            const tensionField = addDepartureTension.closest('.edit-field');
+            const designationField = addDepartureDesignation.closest('.edit-field');
+            const gisementField = addDepartureGisement.closest('.edit-field');
+
+            if (departField?.querySelector('label')) departField.querySelector('label').textContent = carteVoie ? 'Carte' : 'Départ';
+            if (tensionField?.querySelector('label')) tensionField.querySelector('label').textContent = carteVoie ? 'Voie' : 'Tension';
+            if (designationField?.querySelector('label')) designationField.querySelector('label').textContent = 'Désignation';
+            if (gisementField?.querySelector('label')) gisementField.querySelector('label').textContent = 'Gisement';
+            if (gisementField) gisementField.style.display = carteVoie ? 'none' : '';
+            if (carteVoie) addDepartureGisement.value = '';
+        }
+
         function openAddDepartureModal(table) {
             tableReceivingNewDeparture = table;
             const tableName = addTableDisplayName(table);
@@ -12421,6 +12619,7 @@
             addDeparturePasswordStep.style.display = '';
             addDepartureForm.style.display = 'none';
             addDepartureForm.reset();
+            configureAddDepartureModalForTable(table);
             addDepartureModalBackdrop.classList.add('open');
             addDepartureModalBackdrop.setAttribute('aria-hidden', 'false');
             setTimeout(() => addDeparturePassword.focus(), 0);
@@ -12497,6 +12696,7 @@
 
             hierarchyRegisterAddedRows(rows);
             initRowEditing();
+            ensureAddedRowsEditable();
             rebuildSearchIndex();
             if (searchInput.value.trim() !== '') renderSearchResults(searchInput.value);
             saveCloudModification(record.id, record.values, false, {
@@ -12518,7 +12718,10 @@
                 ? editInitialValues.slice(0, 4)
                 : getRowValues(rowBeingEdited).slice(0, 4);
             const values = [0, 1, 2, 3].map(index => rawValues[index] == null ? '' : String(rawValues[index]));
-            const labels = ['Départ', 'Tension', 'Désignation', 'Gisement'];
+            const carteVoie = tableUsesCarteVoieSchema(rowBeingEdited?.closest('table'));
+            const labels = carteVoie
+                ? ['Carte', 'Voie', 'Désignation', '']
+                : ['Départ', 'Tension', 'Désignation', 'Gisement'];
 
             values.forEach((value, index) => {
                 const field = document.createElement('div');
@@ -12536,6 +12739,11 @@
                 // Toujours préremplir avec la valeur affichée avant cette modification.
                 input.value = value;
                 input.autocomplete = 'off';
+                if (carteVoie && index === 3) {
+                    field.style.display = 'none';
+                    input.tabIndex = -1;
+                    input.setAttribute('aria-hidden', 'true');
+                }
 
                 // Édition fine : aucun select() automatique. Un clic place le curseur
                 // exactement à l'endroit choisi pour corriger une lettre ou un mot.
@@ -12787,27 +12995,55 @@
             );
         }
 
+        function carteVoieAlreadyExists(table, carte, voie) {
+            const wantedCarte = normalizeDepartureForDuplicate(carte);
+            const wantedVoie = normalizeDepartureForDuplicate(voie);
+            if (!table || (!wantedCarte && !wantedVoie)) return false;
+            const tableKey = addTableKey(table);
+            if (!tableKey) return false;
+
+            return tablesForAddKey(tableKey).some(candidateTable =>
+                Array.from(candidateTable.tBodies || []).some(tbody =>
+                    Array.from(tbody.rows).some(row => {
+                        if (row.style.display === 'none' && row.id?.startsWith('sub-')) return false;
+                        const values = getRowValues(row);
+                        if (values.length < 3) return false;
+                        return normalizeDepartureForDuplicate(values[0]) === wantedCarte
+                            && normalizeDepartureForDuplicate(values[1]) === wantedVoie;
+                    })
+                )
+            );
+        }
+
         addDepartureForm.addEventListener('submit', event => {
             event.preventDefault();
+            const carteVoie = addDepartureForm.dataset.rowSchema === 'carte-voie-designation';
             const values = [
                 addDepartureDepart.value.trim(),
                 addDepartureTension.value.trim(),
                 addDepartureDesignation.value.trim(),
-                addDepartureGisement.value.trim()
+                carteVoie ? '' : addDepartureGisement.value.trim()
             ];
             if (!values[0] && !values[2]) {
-                addDepartureDesignation.setCustomValidity('Renseignez au minimum un départ ou une désignation.');
+                addDepartureDesignation.setCustomValidity(carteVoie
+                    ? 'Renseignez au minimum une carte ou une désignation.'
+                    : 'Renseignez au minimum un départ ou une désignation.');
                 addDepartureDesignation.reportValidity();
                 addDepartureDesignation.setCustomValidity('');
                 return;
             }
 
-            if (values[0] && departureAlreadyExists(tableReceivingNewDeparture, values[0])) {
+            const duplicate = carteVoie
+                ? carteVoieAlreadyExists(tableReceivingNewDeparture, values[0], values[1])
+                : (values[0] && departureAlreadyExists(tableReceivingNewDeparture, values[0]));
+            if (duplicate) {
                 const tableName = addTableDisplayName(tableReceivingNewDeparture);
-                const confirmed = window.confirm(`Ce départ existe déjà dans ${tableName}. Ajouter quand même ?`);
+                const message = carteVoie
+                    ? `La combinaison Carte « ${values[0] || 'vide'} » / Voie « ${values[1] || 'vide'} » existe déjà dans ${tableName}. Ajouter quand même ?`
+                    : `Ce départ existe déjà dans ${tableName}. Ajouter quand même ?`;
+                const confirmed = window.confirm(message);
                 if (!confirmed) {
                     addDepartureDepart.focus();
-                    addDepartureDepart.select();
                     return;
                 }
             }
@@ -12832,6 +13068,7 @@
         });
 
         initRowEditing();
+        ensureAddedRowsEditable();
         initAddDepartureButtons();
         initCloudSync();
         // ---------------------------------------------------------------------
