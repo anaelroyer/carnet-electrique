@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Carnet Électrique</title>
+    <!-- Version 95 : onglets Force/AER/ACR personnalisables + tableaux/départs synchronisés -->
     <meta name="theme-color" content="#121212">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2324,6 +2325,218 @@
             .panel-item table > tbody > tr > td:nth-child(3) { width: 40%; }
             .panel-item table > thead > tr > th:nth-child(4),
             .panel-item table > tbody > tr > td:nth-child(4) { width: 18%; }
+        }
+
+    
+
+        /* ================================================================
+           Version 96 : onglets adaptatifs/renommables + édition fine
+           ================================================================ */
+        .electrical-tabs-shell {
+            margin: 0 0 14px;
+        }
+        .electrical-tabs-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0 0 10px;
+            padding: 5px;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            background: #111827;
+            overflow-x: auto;
+            overscroll-behavior-x: contain;
+            scrollbar-width: thin;
+            -webkit-overflow-scrolling: touch;
+        }
+        .electrical-tab-btn,
+        .electrical-add-tab-btn {
+            flex: 0 0 auto;
+            min-height: 38px;
+            padding: 7px 13px;
+            border: 1px solid #475569;
+            border-radius: 9px;
+            background: #1e293b;
+            color: #cbd5e1;
+            font: inherit;
+            font-size: .78rem;
+            font-weight: 850;
+            cursor: pointer;
+            white-space: nowrap;
+            touch-action: manipulation;
+        }
+        .electrical-tab-btn:hover,
+        .electrical-tab-btn:focus-visible,
+        .electrical-add-tab-btn:hover,
+        .electrical-add-tab-btn:focus-visible {
+            background: #273449;
+            border-color: #60a5fa;
+            outline: none;
+        }
+        .electrical-tab-btn.active {
+            border-color: #3b82f6;
+            background: #1d4ed8;
+            color: #fff;
+            box-shadow: 0 0 0 1px rgba(96,165,250,.18), 0 5px 16px rgba(0,0,0,.22);
+        }
+        .electrical-add-tab-btn {
+            width: 38px;
+            padding: 0;
+            font-size: 1.25rem;
+            line-height: 1;
+            color: #bfdbfe;
+        }
+        .electrical-tabs-panes {
+            min-width: 0;
+        }
+        .electrical-tab-pane {
+            display: none;
+            min-width: 0;
+        }
+        .electrical-tab-pane.active {
+            display: block;
+        }
+
+        /* Les onglets ajoutés n'ont pas besoin d'un second titre "Domaine ...". */
+        .tab-domain-section {
+            margin: 0;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            overflow: visible;
+        }
+        .tab-domain-section > summary.domain-summary {
+            display: none !important;
+        }
+        .tab-domain-section > .panel-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 0;
+            border-top: 0;
+            background: transparent;
+        }
+        .tab-domain-section > .panel-content > .add-main-table-bar {
+            margin: 0 0 6px;
+        }
+        .empty-tab-hint {
+            padding: 18px 14px;
+            border: 1px dashed #475569;
+            border-radius: 11px;
+            color: #94a3b8;
+            background: rgba(15,23,42,.46);
+            text-align: center;
+            font-size: .78rem;
+            line-height: 1.45;
+        }
+        .tab-domain-section:has(.panel-item) .empty-tab-hint {
+            display: none;
+        }
+        .add-electrical-tab-name {
+            margin: 0 0 10px;
+            color: #93c5fd;
+            font-size: .78rem;
+            font-weight: 750;
+        }
+
+        @media (max-width: 600px) {
+            .electrical-tabs-shell { margin-bottom: 9px; }
+            .electrical-tabs-bar {
+                margin: 0 -1px 8px;
+                padding: 4px;
+                gap: 4px;
+                border-radius: 10px;
+            }
+            .electrical-tab-btn,
+            .electrical-add-tab-btn {
+                min-height: 36px;
+                padding: 6px 11px;
+                font-size: .73rem;
+            }
+            .electrical-add-tab-btn {
+                width: 36px;
+                padding: 0;
+                font-size: 1.15rem;
+            }
+            .tab-domain-section > .panel-content {
+                gap: 9px;
+            }
+            .empty-tab-hint {
+                padding: 14px 10px;
+                font-size: .72rem;
+            }
+        }
+
+    
+
+        /* ================================================================
+           Version 96 : onglets adaptatifs + renommage + édition fine
+           ================================================================ */
+        .electrical-tabs-bar {
+            overflow: hidden;
+            gap: 4px;
+        }
+        .electrical-tab-btn {
+            flex: 1 1 0 !important;
+            min-width: 0;
+            width: auto;
+            padding-left: 6px;
+            padding-right: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            overflow: hidden;
+        }
+        .electrical-tab-label {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .electrical-tab-edit {
+            display: none;
+            flex: 0 0 auto;
+            width: 20px;
+            height: 20px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            background: rgba(255,255,255,.10);
+            color: #dbeafe;
+            font-size: .72rem;
+            line-height: 1;
+        }
+        .electrical-tab-btn.active .electrical-tab-edit {
+            display: inline-flex;
+        }
+        .electrical-tab-edit:hover {
+            background: rgba(255,255,255,.20);
+        }
+        .electrical-add-tab-btn {
+            flex: 0 0 34px !important;
+            width: 34px !important;
+            min-width: 34px;
+            padding: 0 !important;
+        }
+        @media (max-width: 600px) {
+            .electrical-tabs-bar { gap: 3px; }
+            .electrical-tab-btn {
+                min-width: 0;
+                padding-left: 4px;
+                padding-right: 4px;
+                font-size: clamp(.58rem, 2.8vw, .72rem);
+            }
+            .electrical-tab-edit {
+                width: 18px;
+                height: 18px;
+                font-size: .65rem;
+            }
+            .electrical-add-tab-btn {
+                flex-basis: 30px !important;
+                width: 30px !important;
+                min-width: 30px;
+            }
         }
 
     </style>
@@ -9966,7 +10179,7 @@
         }
 
         function hierarchyPrepareActionColumns() {
-            document.querySelectorAll('#panelsContainer table').forEach(table => {
+            document.querySelectorAll('.electrical-tab-pane table').forEach(table => {
                 // Ajoute une cinquième colonne dédiée aux actions, sans toucher aux données.
                 table.querySelectorAll(':scope > thead > tr').forEach(headerRow => {
                     if (headerRow.querySelector(':scope > .hierarchy-action-header')) return;
@@ -10053,6 +10266,533 @@
         });
 
 
+
+        /* ============================================================
+           Onglets électriques — Force / AER / ACR + personnalisés
+           ============================================================ */
+        const ELECTRICAL_TABS_STORAGE_KEY = 'carnetElectriqueTabsV1';
+        const ELECTRICAL_ACTIVE_TAB_KEY = 'carnetElectriqueActiveTabV1';
+        const ELECTRICAL_FIXED_TABS = [
+            { id: 'force', name: 'Force', fixed: true },
+            { id: 'aer', name: 'AER', fixed: true },
+            { id: 'acr', name: 'ACR', fixed: true }
+        ];
+
+        function loadElectricalTabsStorage() {
+            try { return JSON.parse(localStorage.getItem(ELECTRICAL_TABS_STORAGE_KEY) || '{}'); }
+            catch (e) { return {}; }
+        }
+
+        function saveElectricalTabsStorage(tabs) {
+            try { localStorage.setItem(ELECTRICAL_TABS_STORAGE_KEY, JSON.stringify(tabs)); }
+            catch (e) { console.warn('Impossible d’enregistrer les onglets localement.', e); }
+        }
+
+        function electricalTabRandomId() {
+            const randomPart = (window.crypto?.getRandomValues)
+                ? Array.from(window.crypto.getRandomValues(new Uint32Array(2))).map(v => v.toString(36)).join('')
+                : Math.random().toString(36).slice(2) + Date.now().toString(36);
+            return 'tab-' + randomPart;
+        }
+
+        function electricalTabNameExists(name, exceptId = '') {
+            const wanted = String(name || '').trim().toLocaleLowerCase('fr');
+            if (!wanted) return false;
+            return Array.from(document.querySelectorAll('.electrical-tab-btn')).some(button => {
+                if (exceptId && button.dataset.tabId === exceptId) return false;
+                return String(button.dataset.tabName || '').trim().toLocaleLowerCase('fr') === wanted;
+            });
+        }
+
+        function electricalFixedTabById(tabId) {
+            return ELECTRICAL_FIXED_TABS.find(tab => tab.id === tabId) || null;
+        }
+
+        function electricalTabRecord(tabId) {
+            const stored = loadElectricalTabsStorage();
+            if (stored[tabId]?.name) return { ...stored[tabId] };
+            const fixed = electricalFixedTabById(tabId);
+            if (fixed) return { ...fixed, createdAt: 0 };
+            const button = document.querySelector(`.electrical-tab-btn[data-tab-id="${CSS.escape(tabId || '')}"]`);
+            if (button) return { id: tabId, name: button.dataset.tabName || 'Onglet', createdAt: Date.now() };
+            return null;
+        }
+
+        function electricalPaneForTab(tabId) {
+            return document.querySelector(`.electrical-tab-pane[data-tab-id="${CSS.escape(tabId || '')}"]`);
+        }
+
+        function updateElectricalTabEmptyState(tabId) {
+            if (tabId === 'force') return;
+            const pane = electricalPaneForTab(tabId);
+            const domain = pane?.querySelector(':scope > .tab-domain-section');
+            const hint = domain?.querySelector(':scope > .panel-content > .empty-tab-hint');
+            if (!hint) return;
+            hint.style.display = domain.querySelector(':scope > .panel-content > .panel-item') ? 'none' : '';
+        }
+
+        function activateElectricalTab(tabId, options = {}) {
+            const wanted = electricalPaneForTab(tabId) ? tabId : 'force';
+            document.querySelectorAll('.electrical-tab-pane').forEach(pane => {
+                const active = pane.dataset.tabId === wanted;
+                pane.classList.toggle('active', active);
+                pane.hidden = !active;
+            });
+            document.querySelectorAll('.electrical-tab-btn').forEach(button => {
+                const active = button.dataset.tabId === wanted;
+                button.classList.toggle('active', active);
+                button.setAttribute('aria-selected', active ? 'true' : 'false');
+                button.tabIndex = active ? 0 : -1;
+            });
+            try { localStorage.setItem(ELECTRICAL_ACTIVE_TAB_KEY, wanted); } catch (_) {}
+            updateElectricalTabEmptyState(wanted);
+            if (options.focus) {
+                document.querySelector(`.electrical-tab-btn[data-tab-id="${CSS.escape(wanted)}"]`)?.focus({ preventScroll: true });
+            }
+        }
+
+        function activateTabContainingElement(element) {
+            const pane = element?.closest?.('.electrical-tab-pane');
+            if (pane?.dataset?.tabId) activateElectricalTab(pane.dataset.tabId);
+        }
+
+        function createElectricalTabPane(record) {
+            const pane = document.createElement('div');
+            pane.className = 'electrical-tab-pane';
+            pane.dataset.tabId = record.id;
+            pane.dataset.tabName = record.name;
+            pane.id = 'electrical-tab-' + record.id;
+            pane.hidden = true;
+
+            const domain = document.createElement('details');
+            domain.className = 'domain-section tab-domain-section';
+            domain.open = true;
+            domain.dataset.tabId = record.id;
+
+            const summary = document.createElement('summary');
+            summary.className = 'domain-summary';
+            const label = document.createElement('span');
+            label.textContent = record.name;
+            summary.appendChild(label);
+
+            const content = document.createElement('div');
+            content.className = 'panel-content';
+            const hint = document.createElement('div');
+            hint.className = 'empty-tab-hint';
+            hint.textContent = 'Aucun tableau dans cet onglet. Utilisez « + Ajouter un tableau principal » pour commencer.';
+            content.appendChild(hint);
+
+            domain.append(summary, content);
+            pane.appendChild(domain);
+            return pane;
+        }
+
+        function createElectricalTabButton(record) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'electrical-tab-btn';
+            button.dataset.tabId = record.id;
+            button.dataset.tabName = record.name;
+            button.title = record.name;
+            button.setAttribute('role', 'tab');
+            button.setAttribute('aria-selected', 'false');
+
+            const label = document.createElement('span');
+            label.className = 'electrical-tab-label';
+            label.textContent = record.name;
+
+            const edit = document.createElement('span');
+            edit.className = 'electrical-tab-edit';
+            edit.textContent = '✎';
+            edit.title = 'Renommer cet onglet';
+            edit.setAttribute('aria-label', 'Renommer cet onglet');
+
+            button.append(label, edit);
+            button.addEventListener('click', event => {
+                if (event.target.closest('.electrical-tab-edit')) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    window.openRenameElectricalTabModal?.(record.id);
+                    return;
+                }
+                activateElectricalTab(record.id);
+            });
+            button.addEventListener('keydown', event => {
+                if (event.key === 'F2') {
+                    event.preventDefault();
+                    window.openRenameElectricalTabModal?.(record.id);
+                }
+            });
+            return button;
+        }
+
+        function ensureElectricalTabRendered(record, runtime = false) {
+            if (!record?.id || !record?.name) return null;
+
+            let pane = record.id === 'force' ? document.getElementById('panelsContainer') : electricalPaneForTab(record.id);
+            let button = document.querySelector(`.electrical-tab-btn[data-tab-id="${CSS.escape(record.id)}"]`);
+            const panes = document.getElementById('electricalTabsPanes');
+            const bar = document.getElementById('electricalTabsBar');
+            const addButton = document.getElementById('electricalAddTabBtn');
+            if (!panes || !bar) return pane;
+
+            if (!pane && record.id !== 'force') {
+                pane = createElectricalTabPane(record);
+                panes.appendChild(pane);
+            }
+            if (!button) {
+                button = createElectricalTabButton(record);
+                bar.insertBefore(button, addButton || null);
+            }
+
+            if (pane) {
+                pane.dataset.tabName = record.name;
+                const tabDomainLabel = pane.querySelector(':scope > .tab-domain-section > summary span');
+                if (tabDomainLabel) tabDomainLabel.textContent = record.name;
+            }
+            if (button) {
+                button.dataset.tabName = record.name;
+                button.title = record.name;
+                const label = button.querySelector('.electrical-tab-label');
+                if (label) label.textContent = record.name;
+            }
+
+            if (runtime && record.id !== 'force') {
+                if (typeof initAddMainTableButtons === 'function') initAddMainTableButtons();
+                const tables = typeof loadAddedMainTablesStorage === 'function' ? loadAddedMainTablesStorage() : {};
+                Object.values(tables).forEach(tableRecord => {
+                    if (tableRecord?.tabId === record.id && typeof ensureAddedMainTableRendered === 'function') {
+                        ensureAddedMainTableRendered(tableRecord, true);
+                    }
+                });
+                updateElectricalTabEmptyState(record.id);
+            }
+            return pane;
+        }
+
+        function createElectricalTabModal() {
+            if (document.getElementById('addElectricalTabModalBackdrop')) return;
+            const backdrop = document.createElement('div');
+            backdrop.id = 'addElectricalTabModalBackdrop';
+            backdrop.className = 'edit-modal-backdrop';
+            backdrop.setAttribute('aria-hidden', 'true');
+            backdrop.innerHTML = `
+                <div class="edit-modal" role="dialog" aria-modal="true" aria-labelledby="addElectricalTabModalTitle">
+                    <div class="edit-modal-header">
+                        <div id="addElectricalTabModalTitle" class="edit-modal-title">Ajouter un onglet</div>
+                        <button type="button" class="edit-modal-close" data-tab-modal-close aria-label="Fermer">×</button>
+                    </div>
+                    <div class="edit-modal-body">
+                        <div data-tab-password-step>
+                            <p class="edit-note">Saisissez le mot de passe d’édition pour créer un nouvel onglet.</p>
+                            <div class="edit-field">
+                                <label for="addElectricalTabPassword">Mot de passe</label>
+                                <input id="addElectricalTabPassword" type="password" autocomplete="off">
+                            </div>
+                            <div class="edit-error" data-tab-password-error></div>
+                            <div class="edit-modal-actions">
+                                <button type="button" class="edit-cancel-btn" data-tab-modal-close>Annuler</button>
+                                <button type="button" class="edit-unlock-btn" data-tab-unlock>Déverrouiller</button>
+                            </div>
+                        </div>
+                        <form data-tab-form style="display:none;">
+                            <div class="add-electrical-tab-name">Nouvel espace électrique</div>
+                            <div class="edit-field">
+                                <label for="addElectricalTabName">Nom de l’onglet</label>
+                                <input id="addElectricalTabName" type="text" autocomplete="off" maxlength="40" placeholder="Ex. Éclairage">
+                            </div>
+                            <div class="edit-error" data-tab-name-error></div>
+                            <div class="edit-modal-actions">
+                                <button type="button" class="edit-cancel-btn" data-tab-modal-close>Annuler</button>
+                                <button type="submit" class="edit-save-btn">Ajouter l’onglet</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>`;
+            document.body.appendChild(backdrop);
+
+            const passwordStep = backdrop.querySelector('[data-tab-password-step]');
+            const password = backdrop.querySelector('#addElectricalTabPassword');
+            const passwordError = backdrop.querySelector('[data-tab-password-error]');
+            const unlock = backdrop.querySelector('[data-tab-unlock]');
+            const form = backdrop.querySelector('[data-tab-form]');
+            const nameInput = backdrop.querySelector('#addElectricalTabName');
+            const nameError = backdrop.querySelector('[data-tab-name-error]');
+
+            function close() {
+                backdrop.classList.remove('open');
+                backdrop.setAttribute('aria-hidden', 'true');
+                password.value = '';
+                passwordError.textContent = '';
+                nameError.textContent = '';
+                form.reset();
+                passwordStep.style.display = '';
+                form.style.display = 'none';
+            }
+
+            function unlockModal() {
+                if (password.value !== EDIT_PASSWORD) {
+                    passwordError.textContent = 'Mot de passe incorrect.';
+                    password.select();
+                    return;
+                }
+                passwordError.textContent = '';
+                passwordStep.style.display = 'none';
+                form.style.display = '';
+                setTimeout(() => nameInput.focus(), 0);
+            }
+
+            backdrop.querySelectorAll('[data-tab-modal-close]').forEach(button => button.addEventListener('click', close));
+            backdrop.addEventListener('click', event => { if (event.target === backdrop) close(); });
+            unlock.addEventListener('click', unlockModal);
+            password.addEventListener('keydown', event => {
+                if (event.key === 'Enter') { event.preventDefault(); unlockModal(); }
+            });
+            form.addEventListener('submit', event => {
+                event.preventDefault();
+                const name = nameInput.value.trim().replace(/\s+/g, ' ');
+                nameError.textContent = '';
+                if (!name) {
+                    nameError.textContent = 'Renseignez le nom de l’onglet.';
+                    nameInput.focus();
+                    return;
+                }
+                if (electricalTabNameExists(name)) {
+                    nameError.textContent = 'Un onglet porte déjà ce nom.';
+                    nameInput.focus();
+                    nameInput.select();
+                    return;
+                }
+
+                const record = { id: electricalTabRandomId(), name, fixed: false, createdAt: Date.now() };
+                const stored = loadElectricalTabsStorage();
+                stored[record.id] = record;
+                saveElectricalTabsStorage(stored);
+                ensureElectricalTabRendered(record, true);
+                activateElectricalTab(record.id);
+                if (typeof saveCloudModification === 'function') {
+                    saveCloudModification(record.id, null, false, {
+                        addedTab: true,
+                        tabName: record.name,
+                        createdAt: record.createdAt
+                    });
+                }
+                close();
+            });
+
+            window.openAddElectricalTabModal = function() {
+                password.value = '';
+                passwordError.textContent = '';
+                nameError.textContent = '';
+                form.reset();
+                passwordStep.style.display = '';
+                form.style.display = 'none';
+                backdrop.classList.add('open');
+                backdrop.setAttribute('aria-hidden', 'false');
+                setTimeout(() => password.focus(), 0);
+            };
+        }
+
+
+        function createRenameElectricalTabModal() {
+            if (document.getElementById('renameElectricalTabModalBackdrop')) return;
+            const backdrop = document.createElement('div');
+            backdrop.id = 'renameElectricalTabModalBackdrop';
+            backdrop.className = 'edit-modal-backdrop';
+            backdrop.setAttribute('aria-hidden', 'true');
+            backdrop.innerHTML = `
+                <div class="edit-modal" role="dialog" aria-modal="true" aria-labelledby="renameElectricalTabModalTitle">
+                    <div class="edit-modal-header">
+                        <div id="renameElectricalTabModalTitle" class="edit-modal-title">Renommer l’onglet</div>
+                        <button type="button" class="edit-modal-close" data-tab-rename-close aria-label="Fermer">×</button>
+                    </div>
+                    <div class="edit-modal-body">
+                        <div data-tab-rename-password-step>
+                            <p class="edit-note">Saisissez le mot de passe d’édition pour modifier le libellé de l’onglet.</p>
+                            <div class="edit-field">
+                                <label for="renameElectricalTabPassword">Mot de passe</label>
+                                <input id="renameElectricalTabPassword" type="password" autocomplete="off">
+                            </div>
+                            <div class="edit-error" data-tab-rename-password-error></div>
+                            <div class="edit-modal-actions">
+                                <button type="button" class="edit-cancel-btn" data-tab-rename-close>Annuler</button>
+                                <button type="button" class="edit-unlock-btn" data-tab-rename-unlock>Déverrouiller</button>
+                            </div>
+                        </div>
+                        <form data-tab-rename-form style="display:none;">
+                            <div class="edit-field">
+                                <label for="renameElectricalTabName">Libellé de l’onglet</label>
+                                <input id="renameElectricalTabName" type="text" autocomplete="off" maxlength="40">
+                            </div>
+                            <div class="edit-error" data-tab-rename-name-error></div>
+                            <div class="edit-modal-actions">
+                                <button type="button" class="edit-cancel-btn" data-tab-rename-close>Annuler</button>
+                                <button type="submit" class="edit-save-btn">Enregistrer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>`;
+            document.body.appendChild(backdrop);
+
+            const passwordStep = backdrop.querySelector('[data-tab-rename-password-step]');
+            const password = backdrop.querySelector('#renameElectricalTabPassword');
+            const passwordError = backdrop.querySelector('[data-tab-rename-password-error]');
+            const unlock = backdrop.querySelector('[data-tab-rename-unlock]');
+            const form = backdrop.querySelector('[data-tab-rename-form]');
+            const nameInput = backdrop.querySelector('#renameElectricalTabName');
+            const nameError = backdrop.querySelector('[data-tab-rename-name-error]');
+            let tabId = '';
+
+            function close() {
+                backdrop.classList.remove('open');
+                backdrop.setAttribute('aria-hidden', 'true');
+                password.value = '';
+                passwordError.textContent = '';
+                nameError.textContent = '';
+                form.style.display = 'none';
+                passwordStep.style.display = '';
+                tabId = '';
+            }
+
+            function unlockModal() {
+                if (password.value !== EDIT_PASSWORD) {
+                    passwordError.textContent = 'Mot de passe incorrect.';
+                    password.select();
+                    return;
+                }
+                passwordError.textContent = '';
+                passwordStep.style.display = 'none';
+                form.style.display = '';
+                setTimeout(() => nameInput.focus(), 0);
+            }
+
+            backdrop.querySelectorAll('[data-tab-rename-close]').forEach(button => button.addEventListener('click', close));
+            backdrop.addEventListener('click', event => { if (event.target === backdrop) close(); });
+            unlock.addEventListener('click', unlockModal);
+            password.addEventListener('keydown', event => {
+                if (event.key === 'Enter') { event.preventDefault(); unlockModal(); }
+            });
+            form.addEventListener('submit', event => {
+                event.preventDefault();
+                if (!tabId) return;
+                const name = nameInput.value.trim().replace(/\s+/g, ' ');
+                nameError.textContent = '';
+                if (!name) {
+                    nameError.textContent = 'Renseignez le libellé de l’onglet.';
+                    nameInput.focus();
+                    return;
+                }
+                if (electricalTabNameExists(name, tabId)) {
+                    nameError.textContent = 'Un autre onglet porte déjà ce nom.';
+                    nameInput.focus();
+                    return;
+                }
+
+                const previous = electricalTabRecord(tabId) || { id: tabId, createdAt: Date.now() };
+                const record = {
+                    ...previous,
+                    id: tabId,
+                    name,
+                    fixed: !!electricalFixedTabById(tabId),
+                    createdAt: Number(previous.createdAt || 0)
+                };
+                const stored = loadElectricalTabsStorage();
+                stored[tabId] = record;
+                saveElectricalTabsStorage(stored);
+                ensureElectricalTabRendered(record, true);
+                activateElectricalTab(tabId);
+                if (typeof rebuildSearchIndex === 'function') rebuildSearchIndex();
+                if (typeof saveCloudModification === 'function') {
+                    saveCloudModification(tabId, null, false, {
+                        addedTab: true,
+                        fixedTab: record.fixed,
+                        tabName: record.name,
+                        createdAt: record.createdAt
+                    });
+                }
+                close();
+            });
+
+            window.openRenameElectricalTabModal = function(requestedTabId) {
+                const record = electricalTabRecord(requestedTabId);
+                if (!record) return;
+                tabId = requestedTabId;
+                password.value = '';
+                passwordError.textContent = '';
+                nameError.textContent = '';
+                nameInput.value = record.name || '';
+                passwordStep.style.display = '';
+                form.style.display = 'none';
+                backdrop.classList.add('open');
+                backdrop.setAttribute('aria-hidden', 'false');
+                setTimeout(() => password.focus(), 0);
+            };
+        }
+
+        function initElectricalTabs() {
+            const forcePane = document.getElementById('panelsContainer');
+            if (!forcePane || document.getElementById('electricalTabsShell')) return;
+
+            const shell = document.createElement('div');
+            shell.id = 'electricalTabsShell';
+            shell.className = 'electrical-tabs-shell';
+
+            const bar = document.createElement('div');
+            bar.id = 'electricalTabsBar';
+            bar.className = 'electrical-tabs-bar';
+            bar.setAttribute('role', 'tablist');
+            bar.setAttribute('aria-label', 'Sections du carnet électrique');
+
+            const panes = document.createElement('div');
+            panes.id = 'electricalTabsPanes';
+            panes.className = 'electrical-tabs-panes';
+
+            forcePane.parentNode.insertBefore(shell, forcePane);
+            shell.append(bar, panes);
+            panes.appendChild(forcePane);
+            forcePane.classList.add('electrical-tab-pane');
+            forcePane.dataset.tabId = 'force';
+
+            const stored = loadElectricalTabsStorage();
+            const fixedRecords = ELECTRICAL_FIXED_TABS.map(base => ({
+                ...base,
+                ...(stored[base.id] || {}),
+                id: base.id,
+                fixed: true,
+                createdAt: Number(stored[base.id]?.createdAt || 0)
+            }));
+            forcePane.dataset.tabName = fixedRecords[0].name;
+
+            const forceButton = createElectricalTabButton(fixedRecords[0]);
+            bar.appendChild(forceButton);
+
+            fixedRecords.slice(1).forEach(record => ensureElectricalTabRendered(record, false));
+            const fixedIds = new Set(ELECTRICAL_FIXED_TABS.map(tab => tab.id));
+            Object.values(stored)
+                .filter(record => record?.id && record?.name && !fixedIds.has(record.id))
+                .sort((a, b) => Number(a.createdAt || 0) - Number(b.createdAt || 0))
+                .forEach(record => ensureElectricalTabRendered(record, false));
+
+            const addButton = document.createElement('button');
+            addButton.type = 'button';
+            addButton.id = 'electricalAddTabBtn';
+            addButton.className = 'electrical-add-tab-btn';
+            addButton.textContent = '+';
+            addButton.title = 'Ajouter un onglet';
+            addButton.setAttribute('aria-label', 'Ajouter un onglet');
+            addButton.addEventListener('click', () => window.openAddElectricalTabModal?.());
+            bar.appendChild(addButton);
+
+            createElectricalTabModal();
+            createRenameElectricalTabModal();
+
+            let wanted = 'force';
+            try { wanted = localStorage.getItem(ELECTRICAL_ACTIVE_TAB_KEY) || 'force'; } catch (_) {}
+            if (!electricalPaneForTab(wanted)) wanted = 'force';
+            activateElectricalTab(wanted);
+        }
+
+
         /* ============================================================
            Ajout de tableaux principaux — stockage local + rendu dynamique
            ============================================================ */
@@ -10075,9 +10815,20 @@
             return 'added-table-' + randomPart;
         }
 
-        function findDomainSectionByName(domainName) {
+        function findDomainSectionByName(domainName, tabId = '') {
             const wanted = String(domainName || '').trim();
-            return Array.from(document.querySelectorAll('#panelsContainer .domain-section')).find(domain =>
+            if (tabId && tabId !== 'force') {
+                const pane = electricalPaneForTab(tabId);
+                const tabDomain = pane?.querySelector(':scope > .tab-domain-section');
+                if (tabDomain) return tabDomain;
+            }
+            const scope = tabId ? electricalPaneForTab(tabId) : document;
+            const domains = scope ? Array.from(scope.querySelectorAll('.domain-section')) : [];
+            const found = domains.find(domain =>
+                (domain.querySelector(':scope > summary span')?.textContent || '').trim() === wanted
+            );
+            if (found) return found;
+            return Array.from(document.querySelectorAll('.domain-section')).find(domain =>
                 (domain.querySelector(':scope > summary span')?.textContent || '').trim() === wanted
             ) || null;
         }
@@ -10148,17 +10899,21 @@
             if (!record?.id || !record?.domainName || !record?.name) return null;
             const existing = document.querySelector(`.panel-item[data-added-table-id="${CSS.escape(record.id)}"]`);
             if (existing) return existing;
-            const domain = findDomainSectionByName(record.domainName);
+            const domain = findDomainSectionByName(record.domainName, record.tabId || '');
             const domainContent = domain?.querySelector(':scope > .panel-content');
             if (!domainContent) return null;
 
             const panelItem = createAddedMainTableElement(record);
             domainContent.appendChild(panelItem);
+            const pane = domain.closest('.electrical-tab-pane');
+            if (pane?.dataset?.tabId) panelItem.dataset.tabId = pane.dataset.tabId;
+            if (pane?.dataset?.tabId) updateElectricalTabEmptyState(pane.dataset.tabId);
 
             if (runtime) {
                 hierarchyRegisterAddedMainTable(panelItem);
                 hierarchyPrepareActionColumns();
                 if (typeof initAddDepartureButtons === 'function') initAddDepartureButtons();
+                if (typeof compactDetailTableHeaderLabels === 'function') compactDetailTableHeaderLabels();
                 const tableKey = 'main:' + panelItem.querySelector(':scope > details').id;
                 const additions = loadAddedRowsStorage();
                 Object.values(additions).forEach(addition => {
@@ -10175,7 +10930,7 @@
         }
 
         function initAddMainTableButtons() {
-            document.querySelectorAll('#panelsContainer .domain-section').forEach(domain => {
+            document.querySelectorAll('.electrical-tab-pane .domain-section').forEach(domain => {
                 const content = domain.querySelector(':scope > .panel-content');
                 if (!content || content.querySelector(':scope > .add-main-table-bar')) return;
                 const bar = document.createElement('div');
@@ -10355,6 +11110,7 @@
             });
         }
 
+        initElectricalTabs();
         restoreAddedMainTablesBeforeHierarchy();
         restoreAddedRowsBeforeHierarchy();
 
@@ -10677,6 +11433,7 @@
 
         function revealSearchRow(row) {
             if (!row) return;
+            activateTabContainingElement(row);
             const panel = row.closest('.panel-item');
             if (panel) panel.style.display = '';
             const panelDetails = panel?.querySelector(':scope > details');
@@ -11124,10 +11881,25 @@
             const deletions = loadStoredDeletions();
             const wasDeletedLocally = !!deletions[rowId];
 
+
+            if (data && data.addedTab === true && data.deleted !== true && data.tabName) {
+                const tabs = loadElectricalTabsStorage();
+                tabs[rowId] = {
+                    id: rowId,
+                    name: String(data.tabName || '').trim(),
+                    fixed: !!data.fixedTab || !!electricalFixedTabById(rowId),
+                    createdAt: Number(data.createdAt || tabs[rowId]?.createdAt || 0)
+                };
+                saveElectricalTabsStorage(tabs);
+                ensureElectricalTabRendered(tabs[rowId], true);
+                scheduleCloudUiRefresh();
+            }
+
             if (data && data.addedTable === true && data.deleted !== true && data.domainName && data.name) {
                 const tables = loadAddedMainTablesStorage();
                 tables[rowId] = {
                     id: rowId,
+                    tabId: data.tabId || '',
                     domainName: data.domainName,
                     name: data.name,
                     gisement: data.gisement || '',
@@ -11229,6 +12001,28 @@
 
         async function uploadLocalChangesMissingFromCloud() {
             if (!cloudDbAvailable()) return;
+
+            const addedTabs = loadElectricalTabsStorage();
+            for (const record of Object.values(addedTabs)) {
+                if (!record?.id || !record?.name) continue;
+                try {
+                    const ref = window.carnetCloudDb.collection(CLOUD_COLLECTION).doc(record.id);
+                    const snapshot = await ref.get();
+                    if (!snapshot.exists) {
+                        await ref.set({
+                            addedTab: true,
+                            fixedTab: !!record.fixed || !!electricalFixedTabById(record.id),
+                            tabName: record.name,
+                            createdAt: Number(record.createdAt || 0),
+                            deleted: false,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                } catch (error) {
+                    console.warn('Migration Firebase incomplète pour l’onglet', record.id, error);
+                }
+            }
+
             const addedTables = loadAddedMainTablesStorage();
             for (const record of Object.values(addedTables)) {
                 if (!record?.id || !record?.domainName || !record?.name) continue;
@@ -11238,6 +12032,7 @@
                     if (!snapshot.exists) {
                         await ref.set({
                             addedTable: true,
+                            tabId: record.tabId || 'force',
                             domainName: record.domainName,
                             name: record.name,
                             gisement: record.gisement || '',
@@ -11584,8 +12379,10 @@
             const domainName = hierarchyDomainName(domainReceivingNewMainTable);
             if (!domainName) return null;
             const id = addedMainTableRandomId();
+            const tabId = domainReceivingNewMainTable.closest('.electrical-tab-pane')?.dataset?.tabId || 'force';
             const record = {
                 id,
+                tabId,
                 domainName,
                 name: String(name || '').trim(),
                 gisement: String(gisement || '').trim(),
@@ -11597,6 +12394,7 @@
             const panelItem = ensureAddedMainTableRendered(record, true);
             saveCloudModification(record.id, null, false, {
                 addedTable: true,
+                tabId: record.tabId || 'force',
                 domainName: record.domainName,
                 name: record.name,
                 gisement: record.gisement,
@@ -11739,15 +12537,8 @@
                 input.value = value;
                 input.autocomplete = 'off';
 
-                // Ergonomie smartphone : un appui dans un champ sélectionne toute
-                // sa valeur afin que la nouvelle saisie la remplace immédiatement.
-                const selectWholeField = () => {
-                    requestAnimationFrame(() => {
-                        try { input.select(); } catch (_) {}
-                    });
-                };
-                input.addEventListener('focus', selectWholeField);
-                input.addEventListener('click', selectWholeField);
+                // Édition fine : aucun select() automatique. Un clic place le curseur
+                // exactement à l'endroit choisi pour corriger une lettre ou un mot.
 
                 field.appendChild(label);
                 field.appendChild(input);
@@ -11763,7 +12554,6 @@
                 const firstInput = editFields.querySelector('input');
                 if (firstInput) {
                     firstInput.focus({ preventScroll: true });
-                    try { firstInput.select(); } catch (_) {}
                 }
             });
         }
@@ -11777,6 +12567,7 @@
         }
 
         function openEditModal(row, options = {}) {
+            if (row) activateTabContainingElement(row);
             rowBeingEdited = row;
             // Depuis l'infobulle, les valeurs sont transmises explicitement : elles
             // correspondent exactement à ce que l'utilisateur voit, y compris les
@@ -12064,7 +12855,7 @@
         clearSearchBtn.classList.toggle('open', searchInput.value.trim() !== '');
         rebuildSearchIndex();
         // Les domaines restent ouverts au démarrage ; les tableaux et sous-tableaux restent repliés.
-        document.querySelectorAll('#panelsContainer .domain-section').forEach(domain => {
+        document.querySelectorAll('.electrical-tab-pane .domain-section').forEach(domain => {
             domain.style.display = '';
             domain.open = true;
         });
@@ -12134,7 +12925,7 @@
 
         window.addEventListener('load', () => {
             refreshStackedGisements();
-            const root = document.getElementById('panelsContainer');
+            const root = document.getElementById('electricalTabsShell') || document.getElementById('panelsContainer');
             if (!root) return;
             const observer = new MutationObserver(queueRefresh);
             observer.observe(root, { subtree: true, childList: true, characterData: true });
